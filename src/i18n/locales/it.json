@@ -67,9 +67,9 @@
     "apocalisseDesc": "Dark Fantasy post-apocalittico ambientato nella Piana dell'Armageddon. Usa le classi base D&D 5e con 12 archetipi apocalittici unici.",
     "apocalissePromo": "Se ti piace Apocalisse, compra i manuali su",
     "dnd5ePromo": "Se ti piace D&D 5e, compra i manuali su",
-    "dnd5eFeatures": "12 classi \u2022 9 razze \u2022 Livello 1-20",
-    "brancaloniaFeatures": "12 sottoclassi \u2022 6 razze \u2022 Livello 1-6",
-    "apocalisseFeatures": "12 archetipi \u2022 6 origini \u2022 Livello 1-20"
+    "dnd5eFeatures": "12 classi • 9 razze • Livello 1-20",
+    "brancaloniaFeatures": "12 sottoclassi • 6 razze • Livello 1-6",
+    "apocalisseFeatures": "12 archetipi • 6 origini • Livello 1-20"
   },
   "race": {
     "title": "Scegli la Razza",
@@ -395,7 +395,8 @@
         "bonds": "Ho prestato giuramento davanti all'altare dorato di Bahamut per portare giustizia nelle terre di frontiera senza legge.",
         "flaws": "In segreto credo che tutti siano inferiori a me, e faccio fatica a nascondere questa convinzione.",
         "eyes": "Oro",
-        "skin": "Scaglie dorate"
+        "skin": "Scaglie dorate",
+        "hair": "Nessuno (Dragonide)"
       },
       "cleric-dwarf-thordin-stoneheart": {
         "description": "Thordin Stoneheart e' un Chierico Nano delle Colline di livello 5, un devoto sacerdote del dio della forgia il cui martello da guerra frantuma i non-morti. Con il Dominio della Vita, le sue preghiere guariscono le ferite e proteggono i fedeli.",
@@ -1117,9 +1118,9 @@
         "hair": "Incolori, sottili e inconsistenti",
         "skin": "Grigio-biancastra, come prosciugata di ogni pigmento"
       }
-    }
-  },
-  "units": {
-    "feet": "m"
+    },
+    "characterNotFound": "Personaggio Non Trovato",
+    "bioTitle": "Biografia",
+    "goldPieces": "mo"
   }
 }

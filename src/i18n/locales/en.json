@@ -67,9 +67,9 @@
     "apocalisseDesc": "Post-apocalyptic Dark Fantasy set on the Plain of Armageddon. Uses D&D 5e base classes with 12 unique apocalyptic archetypes.",
     "apocalissePromo": "If you like Apocalisse, buy the manuals on",
     "dnd5ePromo": "If you like D&D 5e, buy the manuals on",
-    "dnd5eFeatures": "12 classes \u2022 9 races \u2022 Level 1-20",
-    "brancaloniaFeatures": "12 subclasses \u2022 6 races \u2022 Level 1-6",
-    "apocalisseFeatures": "12 archetypes \u2022 6 origins \u2022 Level 1-20"
+    "dnd5eFeatures": "12 classes • 9 races • Level 1-20",
+    "brancaloniaFeatures": "12 subclasses • 6 races • Level 1-6",
+    "apocalisseFeatures": "12 archetypes • 6 origins • Level 1-20"
   },
   "race": {
     "title": "Choose Race",
@@ -395,7 +395,8 @@
         "bonds": "I swore an oath before the golden altar of Bahamut that I would bring justice to the lawless frontier.",
         "flaws": "I secretly believe that everyone is beneath me, and I have a hard time hiding that conviction.",
         "eyes": "Gold",
-        "skin": "Golden scales"
+        "skin": "Golden scales",
+        "hair": "None (Dragonborn)"
       },
       "cleric-dwarf-thordin-stoneheart": {
         "description": "Thordin Stoneheart is a Level 5 Hill Dwarf Cleric (Life Domain) and devout smith-priest of Moradin whose prayers mend wounds and whose warhammer shatters the undead. Born deep within the mountain halls of Ironhold, he brings healing and divine light wherever darkness festers.",
@@ -1117,9 +1118,9 @@
         "hair": "Colorless, thin and wispy",
         "skin": "Grey-white, as if drained of all pigment"
       }
-    }
-  },
-  "units": {
-    "feet": "ft"
+    },
+    "characterNotFound": "Character Not Found",
+    "bioTitle": "Bio",
+    "goldPieces": "gp"
   }
 }

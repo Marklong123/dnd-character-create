@@ -912,6 +912,11 @@ export const featureNamesIt: Record<string, string> = {
   'Indomitable Freedom of Lilith': 'Liberta\' Indomabile di Lilith',
   'Rebellion Against Fate': 'Ribellione contro il Destino',
   'Ultimate Freedom of Lilith': 'Liberta\' Suprema di Lilith',
+  // Morgant racial traits (Title Case form used in blog character data)
+  'Powerful Build': 'Corporatura Possente',
+  'Big Appetite': 'Grande Appetito',
+  'Natural Athlete': 'Atleta Naturale',
+  'Demi-Giant Resilience': 'Resilienza del Semigigante',
 }
 
 // ─── Racial Trait Names (keyed by exact IDs from race data) ────────────────

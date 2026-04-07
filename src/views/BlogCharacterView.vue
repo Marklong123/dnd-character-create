@@ -8,6 +8,7 @@ import { useGameTerms } from '@/composables/useGameTerms'
 import { usePdfExport } from '@/composables/usePdfExport'
 import { generateShareUrl } from '@/utils/shareCharacter'
 import { modifier, proficiencyBonus } from '@/utils/calculations'
+import { armor as armorTable } from '@/data/dnd5e/equipment'
 import type { CharacterData } from '@/stores/character'
 
 const route = useRoute()
@@ -38,7 +39,26 @@ const profBonus = computed(() => char.value ? proficiencyBonus(char.value.level)
 
 const armorClass = computed(() => {
   if (!char.value) return 10
-  return 10 + abilityMod('dex')
+  const dexMod = abilityMod('dex')
+  const armorData = char.value.armor
+    ? armorTable.find(a => a.name === char.value!.armor)
+    : null
+  let ac: number
+  if (!armorData) {
+    // Unarmored: 10 + DEX mod
+    ac = 10 + dexMod
+  } else if (armorData.maxDexBonus === 0) {
+    // Heavy armor: flat baseAC
+    ac = armorData.baseAC
+  } else if (armorData.maxDexBonus !== null) {
+    // Medium armor: baseAC + min(DEX mod, maxDexBonus)
+    ac = armorData.baseAC + Math.min(dexMod, armorData.maxDexBonus)
+  } else {
+    // Light armor: baseAC + DEX mod
+    ac = armorData.baseAC + dexMod
+  }
+  if (char.value.shield) ac += 2
+  return ac
 })
 
 const abilities = ['str', 'dex', 'con', 'int', 'wis', 'cha'] as const
@@ -130,7 +150,7 @@ onUnmounted(() => {
 <template>
   <!-- 404 guard -->
   <section v-if="!char" class="py-16 text-center">
-    <h2 class="text-2xl font-bold text-stone-400 mb-4">Character Not Found</h2>
+    <h2 class="text-2xl font-bold text-stone-400 mb-4">{{ t('blog.characterNotFound') }}</h2>
     <router-link to="/blog" class="text-amber-400 hover:text-amber-300 transition-colors">
       {{ t('blog.backToList') }}
     </router-link>
@@ -229,7 +249,7 @@ onUnmounted(() => {
     <!-- ─── Bio ─────────────────────────────────────────────────────── -->
     <section class="bg-stone-800 rounded-xl border border-stone-700 p-6">
       <h2 class="text-xl font-bold text-amber-400 mb-3 font-gothic">
-        <span aria-hidden="true">📜</span> Bio
+        <span aria-hidden="true">📜</span> {{ t('blog.bioTitle') }}
       </h2>
       <p class="text-stone-300 leading-relaxed">
         {{ t(`blog.characters.${slug}.bio`) }}
@@ -298,7 +318,7 @@ onUnmounted(() => {
         </div>
         <div class="bg-stone-900/50 rounded-lg p-3 text-center">
           <span class="text-xs text-stone-500 uppercase block">{{ t('review.speed') }}</span>
-          <span class="text-2xl font-bold text-stone-100">{{ char.speed }} {{ t('units.feet') }}</span>
+          <span class="text-2xl font-bold text-stone-100">{{ char.speed }} ft</span>
         </div>
         <div class="bg-stone-900/50 rounded-lg p-3 text-center">
           <span class="text-xs text-stone-500 uppercase block">{{ t('review.proficiencyBonus') }}</span>
@@ -390,7 +410,7 @@ onUnmounted(() => {
         </li>
       </ul>
       <p v-if="char.coins.gp > 0" class="text-sm text-stone-400 mt-2">
-        {{ t('equipment.coins') }}: {{ char.coins.gp }} gp
+        {{ t('equipment.coins') }}: {{ char.coins.gp }} {{ t('blog.goldPieces') }}
       </p>
     </section>
 
