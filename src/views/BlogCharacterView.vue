@@ -469,7 +469,7 @@ onUnmounted(() => {
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-sm text-center">
         <div v-if="char.age" class="bg-stone-900/50 rounded-lg p-2">
           <span class="text-stone-500 block text-xs">{{ t('details.age') }}</span>
-          <span class="text-stone-200">{{ char.age }}</span>
+          <span class="text-stone-200">{{ charField('age') }}</span>
         </div>
         <div v-if="char.height" class="bg-stone-900/50 rounded-lg p-2">
           <span class="text-stone-500 block text-xs">{{ t('details.height') }}</span>

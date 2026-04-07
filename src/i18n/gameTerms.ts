@@ -518,11 +518,16 @@ export const skillNamesIt: Record<string, string> = {
 /** Armor/weapon proficiency category labels in Italian */
 export const proficiencyNamesIt: Record<string, string> = {
   'light': 'Armature Leggere',
+  'light armor': 'Armature Leggere',
   'medium': 'Armature Medie',
+  'medium armor': 'Armature Medie',
   'heavy': 'Armature Pesanti',
+  'heavy armor': 'Armature Pesanti',
   'shields': 'Scudi',
   'simple': 'Armi Semplici',
+  'simple weapons': 'Armi Semplici',
   'martial': 'Armi da Guerra',
+  'martial weapons': 'Armi da Guerra',
   'all': 'Tutte',
 }
 
