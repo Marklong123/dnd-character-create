@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
-  history: createWebHistory('/dnd-character-builder/'),
+  history: createWebHistory('/dnd-character-create/'),
   routes: [
     {
       path: '/',

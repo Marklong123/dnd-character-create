@@ -2,7 +2,7 @@
 
 A free, open-source character builder for **D&D 5th Edition**, **Brancalonia**, and **Apocalisse**. Runs entirely in your browser — no server, no account, no tracking.
 
-**[Try it live](https://fullo.github.io/dnd-character-builder/)**
+**[Try it live](https://marklong123.github.io/dnd-character-create/)**
 
 ## Features
 
@@ -21,18 +21,18 @@ A free, open-source character builder for **D&D 5th Edition**, **Brancalonia**, 
 
 ### Use online
 
-Visit **https://fullo.github.io/dnd-character-builder/** — that's it!
+Visit **https://marklong123.github.io/dnd-character-create/** — that's it!
 
 ### Run locally
 
 ```bash
-git clone https://github.com/fullo/dnd-character-builder.git
-cd dnd-character-builder
+git clone https://github.com/Marklong123/dnd-character-create.git
+cd dnd-character-create
 npm install
 npm run dev
 ```
 
-Open http://localhost:5173/dnd-character-builder/ in your browser.
+Open http://localhost:5173/dnd-character-create/ in your browser.
 
 ### Build for production
 
@@ -114,7 +114,7 @@ This repo includes a pre-built `docs/` folder. To deploy:
 1. Go to your repo **Settings > Pages**
 2. Set **Source** to **Deploy from a branch**
 3. Set **Branch** to `main` and **Folder** to `/docs`
-4. Save — your site will be live at `https://<username>.github.io/dnd-character-builder/`
+4. Save — your site will be live at `https://<username>.github.io/dnd-character-create/`
 
 To update the deployment, rebuild and commit:
 

@@ -9,7 +9,7 @@ import { resolve } from 'path'
 const buildHash = execSync('git rev-parse --short HEAD').toString().trim()
 
 export default defineConfig({
-  base: '/dnd-character-builder/',
+  base: '/dnd-character-create/',
   define: {
     __BUILD_HASH__: JSON.stringify(buildHash),
   },
@@ -26,8 +26,8 @@ export default defineConfig({
         theme_color: '#292524',
         background_color: '#1c1917',
         display: 'standalone',
-        scope: '/dnd-character-builder/',
-        start_url: '/dnd-character-builder/',
+        scope: '/dnd-character-create/',
+        start_url: '/dnd-character-create/',
         icons: [
           {
             src: 'pwa-192x192.svg',

@@ -138,8 +138,8 @@ export function decodeCharacterFromUrl(encoded: string): Partial<CharacterData> 
 /** Generate a full share URL for the character */
 export function generateShareUrl(char: CharacterData): string {
   const encoded = encodeCharacterToUrl(char)
-  // Use history-mode URL: /dnd-character-builder/share/ENCODED
-  const base = window.location.origin + '/dnd-character-builder'
+  // Use history-mode URL: /dnd-character-create/share/ENCODED
+  const base = window.location.origin + '/dnd-character-create'
   return `${base}/share/${encoded}`
 }
 
