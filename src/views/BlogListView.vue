@@ -1,41 +1,22 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect, onUnmounted } from 'vue'
+import { computed, watchEffect, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { blogCharacters } from '@/data/blog/characters'
 import { useGameTerms } from '@/composables/useGameTerms'
-import type { GameVariant } from '@/stores/app'
 
 const { t } = useI18n()
 const gt = useGameTerms()
 
-const activeFilter = ref<'all' | GameVariant>('all')
-
 const filteredCharacters = computed(() => {
-  if (activeFilter.value === 'all') return blogCharacters
-  return blogCharacters.filter(c => c.variant === activeFilter.value)
+  return blogCharacters.filter(c => c.variant === 'dnd5e')
 })
 
-const filters: { id: 'all' | GameVariant; key: string }[] = [
-  { id: 'all', key: 'blog.filters.all' },
-  { id: 'dnd5e', key: 'blog.filters.dnd5e' },
-  { id: 'brancalonia', key: 'blog.filters.brancalonia' },
-  { id: 'apocalisse', key: 'blog.filters.apocalisse' },
-]
-
-function variantColor(variant: GameVariant): string {
-  switch (variant) {
-    case 'dnd5e': return 'bg-amber-900/40 text-amber-400'
-    case 'brancalonia': return 'bg-emerald-900/40 text-emerald-400'
-    case 'apocalisse': return 'bg-red-900/40 text-red-400'
-  }
+function variantColor(): string {
+  return 'bg-amber-900/40 text-amber-400'
 }
 
-function variantBorder(variant: GameVariant): string {
-  switch (variant) {
-    case 'dnd5e': return 'border-amber-600/40 hover:border-amber-500/60'
-    case 'brancalonia': return 'border-emerald-600/40 hover:border-emerald-500/60'
-    case 'apocalisse': return 'border-red-600/40 hover:border-red-500/60'
-  }
+function variantBorder(): string {
+  return 'border-amber-600/40 hover:border-amber-500/60'
 }
 
 // SEO: update document title and meta description
@@ -61,24 +42,6 @@ onUnmounted(() => {
       </p>
     </div>
 
-    <!-- Variant filter tabs -->
-    <nav class="flex flex-wrap gap-2 mb-8" aria-label="Filter by variant">
-      <button
-        v-for="f in filters"
-        :key="f.id"
-        @click="activeFilter = f.id"
-        :class="[
-          'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
-          activeFilter === f.id
-            ? 'bg-amber-600 text-stone-900'
-            : 'bg-stone-800 text-stone-300 hover:bg-stone-700'
-        ]"
-        :aria-pressed="activeFilter === f.id"
-      >
-        {{ t(f.key) }}
-      </button>
-    </nav>
-
     <!-- Character grid -->
     <div class="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <router-link
@@ -87,14 +50,14 @@ onUnmounted(() => {
         :to="`/blog/${char.slug}`"
         :class="[
           'bg-stone-800 rounded-xl border p-5 flex flex-col gap-3 transition-colors no-underline group',
-          variantBorder(char.variant),
+          variantBorder(),
         ]"
       >
         <div class="flex items-start justify-between gap-2">
           <h3 class="text-lg font-bold text-amber-400 font-gothic group-hover:text-amber-300 transition-colors">
             {{ char.characterData.name }}
           </h3>
-          <span :class="['text-xs uppercase px-2 py-0.5 rounded whitespace-nowrap', variantColor(char.variant)]">
+          <span :class="['text-xs uppercase px-2 py-0.5 rounded whitespace-nowrap', variantColor()]">
             {{ char.variant }}
           </span>
         </div>

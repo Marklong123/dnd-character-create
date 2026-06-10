@@ -7,7 +7,7 @@ export type ThemeMode = 'light' | 'dark' | 'auto'
 export const useAppStore = defineStore('app', () => {
   const locale = ref<string>(navigator.language.startsWith('it') ? 'it' : 'en')
   const currentStep = ref(0)
-  const totalSteps = ref(9)
+  const totalSteps = ref(8)
   const theme = ref<ThemeMode>('auto')
 
   function setLocale(lang: string) {

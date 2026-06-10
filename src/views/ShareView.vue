@@ -24,7 +24,7 @@ onMounted(() => {
     }
 
     const partial = decodeCharacterFromUrl(data)
-    const validVariants = ['dnd5e', 'brancalonia', 'apocalisse']
+    const validVariants = ['dnd5e']
     if (!partial.variant || !validVariants.includes(partial.variant)) {
       error.value = true
       return
@@ -41,7 +41,7 @@ onMounted(() => {
     characterName.value = characterStore.character.name || t('common.unnamed')
 
     // Navigate to review step
-    appStore.setStep(8)
+    appStore.setStep(7)
     router.replace('/builder')
   } catch (err) {
     console.error('Failed to decode shared character:', err)

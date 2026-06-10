@@ -5,7 +5,7 @@ import { useAppStore } from '@/stores/app'
 const { t } = useI18n()
 const appStore = useAppStore()
 
-const stepKeys = ['variant', 'race', 'class', 'abilities', 'background', 'equipment', 'spells', 'details', 'review']
+const stepKeys = ['race', 'class', 'abilities', 'background', 'equipment', 'spells', 'details', 'review']
 </script>
 
 <template>

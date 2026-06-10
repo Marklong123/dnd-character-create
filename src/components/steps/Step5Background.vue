@@ -6,7 +6,7 @@ import { getBackgrounds } from '@/data'
 import type { Background } from '@/data/dnd5e/backgrounds'
 import { SKILLS } from '@/data/dnd5e/skills'
 import { useGameTerms } from '@/composables/useGameTerms'
-import VariantPromo from '@/components/shared/VariantPromo.vue'
+import { pickRoleplayValue, type RoleplayPreset } from '@/data/dnd5e/roleplayPresets'
 
 const { t } = useI18n()
 const characterStore = useCharacterStore()
@@ -35,6 +35,10 @@ function selectBackground(bg: Background) {
       characterStore.character.skillProficiencies.push(skill)
     }
   }
+}
+
+function randomizeRoleplayField(field: keyof RoleplayPreset) {
+  characterStore.character[field] = pickRoleplayValue(field)
 }
 </script>
 
@@ -84,27 +88,41 @@ function selectBackground(bg: Background) {
     <!-- Personality -->
     <div class="mt-6 space-y-4">
       <div>
-        <label for="personality-traits" class="block text-sm font-semibold text-stone-300 mb-1">{{ t('background.personalityTraits') }}</label>
+        <div class="flex items-center justify-between gap-3 mb-1">
+          <label for="personality-traits" class="block text-sm font-semibold text-stone-300">{{ t('background.personalityTraits') }}</label>
+          <button
+            type="button"
+            class="text-xs px-2 py-1 rounded bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 cursor-pointer"
+            @click="randomizeRoleplayField('personalityTraits')"
+          >{{ t('background.random') }}</button>
+        </div>
         <textarea id="personality-traits" v-model="characterStore.character.personalityTraits" rows="2"
           class="w-full bg-stone-800 border border-stone-700 rounded-lg p-3 text-stone-200 text-sm focus:border-amber-500 focus:outline-none" />
       </div>
       <div>
-        <label for="ideals" class="block text-sm font-semibold text-stone-300 mb-1">{{ t('background.ideals') }}</label>
+        <div class="flex items-center justify-between gap-3 mb-1">
+          <label for="ideals" class="block text-sm font-semibold text-stone-300">{{ t('background.ideals') }}</label>
+          <button
+            type="button"
+            class="text-xs px-2 py-1 rounded bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 cursor-pointer"
+            @click="randomizeRoleplayField('ideals')"
+          >{{ t('background.random') }}</button>
+        </div>
         <textarea id="ideals" v-model="characterStore.character.ideals" rows="2"
           class="w-full bg-stone-800 border border-stone-700 rounded-lg p-3 text-stone-200 text-sm focus:border-amber-500 focus:outline-none" />
       </div>
       <div>
-        <label for="bonds" class="block text-sm font-semibold text-stone-300 mb-1">{{ t('background.bonds') }}</label>
-        <textarea id="bonds" v-model="characterStore.character.bonds" rows="2"
-          class="w-full bg-stone-800 border border-stone-700 rounded-lg p-3 text-stone-200 text-sm focus:border-amber-500 focus:outline-none" />
-      </div>
-      <div>
-        <label for="flaws" class="block text-sm font-semibold text-stone-300 mb-1">{{ t('background.flaws') }}</label>
+        <div class="flex items-center justify-between gap-3 mb-1">
+          <label for="flaws" class="block text-sm font-semibold text-stone-300">{{ t('background.flaws') }}</label>
+          <button
+            type="button"
+            class="text-xs px-2 py-1 rounded bg-stone-700 hover:bg-stone-600 text-stone-200 border border-stone-600 cursor-pointer"
+            @click="randomizeRoleplayField('flaws')"
+          >{{ t('background.random') }}</button>
+        </div>
         <textarea id="flaws" v-model="characterStore.character.flaws" rows="2"
           class="w-full bg-stone-800 border border-stone-700 rounded-lg p-3 text-stone-200 text-sm focus:border-amber-500 focus:outline-none" />
       </div>
     </div>
-
-    <VariantPromo :variant="characterStore.character.variant" />
   </section>
 </template>

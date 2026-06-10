@@ -7,10 +7,10 @@ describe('useAppStore', () => {
     setActivePinia(createPinia())
   })
 
-  it('initializes with step 0 and 9 total steps', () => {
+  it('initializes with step 0 and 8 total steps', () => {
     const store = useAppStore()
     expect(store.currentStep).toBe(0)
-    expect(store.totalSteps).toBe(9)
+    expect(store.totalSteps).toBe(8)
   })
 
   it('navigates forward through steps', () => {
@@ -23,9 +23,9 @@ describe('useAppStore', () => {
 
   it('does not exceed max steps', () => {
     const store = useAppStore()
-    store.setStep(8) // last step (0-indexed)
+    store.setStep(7) // last step (0-indexed)
     store.nextStep()
-    expect(store.currentStep).toBe(8) // stays at 8
+    expect(store.currentStep).toBe(7) // stays at 7
   })
 
   it('navigates backward', () => {

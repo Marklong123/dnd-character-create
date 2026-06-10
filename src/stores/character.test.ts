@@ -256,13 +256,17 @@ describe('useCharacterStore', () => {
       expect((data as any).maliciousField).toBeUndefined()
     })
 
-    it('accepts all three variants', () => {
+    it('accepts only dnd5e variant', () => {
       const store = useCharacterStore()
-      for (const variant of ['dnd5e', 'brancalonia', 'apocalisse'] as const) {
-        const json = JSON.stringify(makeMinimalCharacter({ variant }))
-        const { data } = store.importJson(json)
-        expect(data.variant).toBe(variant)
-      }
+      const json = JSON.stringify(makeMinimalCharacter({ variant: 'dnd5e' }))
+      const { data } = store.importJson(json)
+      expect(data.variant).toBe('dnd5e')
+    })
+
+    it('rejects non-dnd5e variants', () => {
+      const store = useCharacterStore()
+      const json = JSON.stringify(makeMinimalCharacter({ variant: 'brancalonia' }))
+      expect(() => store.importJson(json)).toThrow('VALIDATION:MISSING_VARIANT')
     })
   })
 

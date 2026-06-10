@@ -409,7 +409,50 @@ export const useCharacterStore = defineStore('character', () => {
   }
 
   function exportJson(): string {
-    return JSON.stringify(character.value, null, 2)
+    const {
+      bonds,
+      backstory,
+      age,
+      height,
+      weight,
+      eyes,
+      hair,
+      skin,
+      allies,
+      treasure,
+      sessionNotes,
+      brawlingMoves,
+      misdeeds,
+      size,
+      whacksLevel,
+      mark,
+      markSpirit,
+      virtue,
+      sin,
+      humanity,
+      ...exportable
+    } = character.value
+    void bonds
+    void backstory
+    void age
+    void height
+    void weight
+    void eyes
+    void hair
+    void skin
+    void allies
+    void treasure
+    void sessionNotes
+    void brawlingMoves
+    void misdeeds
+    void size
+    void whacksLevel
+    void mark
+    void markSpirit
+    void virtue
+    void sin
+    void humanity
+    return JSON.stringify(exportable, null, 2)
   }
 
   /**
@@ -432,7 +475,7 @@ export const useCharacterStore = defineStore('character', () => {
     const errors: string[] = []
 
     // Validate variant
-    const validVariants = ['dnd5e', 'brancalonia', 'apocalisse']
+    const validVariants = ['dnd5e']
     if (!raw.variant || !validVariants.includes(raw.variant as string)) {
       errors.push('MISSING_VARIANT')
     }
@@ -531,7 +574,18 @@ export const useCharacterStore = defineStore('character', () => {
       ...empty,
       ...(safeRaw as Partial<CharacterData>),
       id: (typeof raw.id === 'string' && raw.id.length < 100) ? raw.id : crypto.randomUUID(),
-      variant: raw.variant as GameVariant,
+      variant: 'dnd5e' as GameVariant,
+      bonds: '',
+      backstory: '',
+      age: '',
+      height: '',
+      weight: '',
+      eyes: '',
+      hair: '',
+      skin: '',
+      allies: '',
+      treasure: '',
+      sessionNotes: '',
     }
 
     // Add warnings for optional missing fields

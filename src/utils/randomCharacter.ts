@@ -5,7 +5,7 @@ import { getRaces, getClasses, getBackgrounds, getSpells, getSpellSlots, getCant
 import { simpleWeapons, martialWeapons, armor as armorData } from '@/data/dnd5e/equipment'
 import { rollAbilityScores } from './diceRoller'
 import { modifier, totalHp, proficiencyBonus } from './calculations'
-import { pickRandomArchetype } from '@/data/personalityArchetypes'
+import { pickRoleplayPreset } from '@/data/dnd5e/roleplayPresets'
 
 function pick<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]!
@@ -29,10 +29,6 @@ const FANTASY_NAMES = [
 ]
 
 const ALIGNMENTS = ['lg', 'ng', 'cg', 'ln', 'tn', 'cn', 'le', 'ne', 'ce']
-
-const EYE_COLORS = ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Black', 'Violet', 'Gold', 'Red']
-const HAIR_COLORS = ['Black', 'Brown', 'Blonde', 'Red', 'Auburn', 'White', 'Silver', 'Gray', 'Bald']
-const SKIN_TONES = ['Fair', 'Light', 'Olive', 'Tan', 'Brown', 'Dark', 'Pale', 'Bronze', 'Copper', 'Green']
 
 function getAvailableWeapons(cls: CharacterClass) {
   const available = [...([] as typeof simpleWeapons[number][])]
@@ -251,7 +247,7 @@ export function generateRandomCharacter(variant: GameVariant, forcedLevel?: numb
   const { weapons, armorName, useShield } = selectClassGear(cls, strMod, dexMod, prof)
 
   const name = pick(FANTASY_NAMES)
-  const archetype = pickRandomArchetype()
+  const roleplay = pickRoleplayPreset()
 
   return {
     id: crypto.randomUUID(),
@@ -278,18 +274,18 @@ export function generateRandomCharacter(variant: GameVariant, forcedLevel?: numb
     shield: useShield,
     equipment,
     coins: { cp: 0, sp: 0, ep: 0, gp: randomInt(10, 50), pp: 0 },
-    personalityTraits: archetype.personalityTraits,
-    ideals: archetype.ideals,
-    bonds: archetype.bonds,
-    flaws: archetype.flaws,
+    personalityTraits: roleplay.personalityTraits,
+    ideals: roleplay.ideals,
+    bonds: '',
+    flaws: roleplay.flaws,
     featuresTraits: features,
     backstory: '',
-    age: String(randomInt(18, 150)),
-    height: `${randomInt(4, 6)}'${randomInt(0, 11)}"`,
-    weight: `${randomInt(90, 250)} lbs`,
-    eyes: pick(EYE_COLORS),
-    hair: pick(HAIR_COLORS),
-    skin: pick(SKIN_TONES),
+    age: '',
+    height: '',
+    weight: '',
+    eyes: '',
+    hair: '',
+    skin: '',
     allies: '',
     treasure: '',
     spellcastingClass,

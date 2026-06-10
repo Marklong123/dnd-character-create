@@ -12,15 +12,12 @@ const characterStore = useCharacterStore()
 
 // WSG 3.8: Preload data for current step when builder opens (for returning users past Step 1)
 onMounted(async () => {
-  const variant = characterStore.character.variant
-  if (variant) {
-    await ensureStepData(variant, appStore.currentStep)
-  }
+  characterStore.character.variant = 'dnd5e'
+  await ensureStepData('dnd5e', appStore.currentStep + 1)
 })
 
 // WSG 3.8: Defer loading of non-critical resources — lazy load wizard steps
 const steps = [
-  defineAsyncComponent(() => import('@/components/steps/Step1Variant.vue')),
   defineAsyncComponent(() => import('@/components/steps/Step2Race.vue')),
   defineAsyncComponent(() => import('@/components/steps/Step3Class.vue')),
   defineAsyncComponent(() => import('@/components/steps/Step4Abilities.vue')),
@@ -31,7 +28,7 @@ const steps = [
   defineAsyncComponent(() => import('@/components/steps/Step9Review.vue')),
 ]
 
-const stepKeys = ['variant', 'race', 'class', 'abilities', 'background', 'equipment', 'spells', 'details', 'review']
+const stepKeys = ['race', 'class', 'abilities', 'background', 'equipment', 'spells', 'details', 'review']
 
 // ─── Step Validation ──────────────────────────────────────────────────────
 const validationMessage = ref('')
@@ -41,14 +38,13 @@ const isLoadingStep = ref(false)
 const isCurrentStepValid = computed((): boolean => {
   const char = characterStore.character
   switch (appStore.currentStep) {
-    case 0: return !!char.variant             // Variant selected
-    case 1: return !!char.race                // Race selected
-    case 2: return !!char.className           // Class selected
-    case 3: return true                       // Abilities always valid (defaults)
-    case 4: return !!char.background          // Background selected
-    case 5: return true                       // Equipment optional
-    case 6: return true                       // Spells optional (non-casters skip)
-    case 7: return true                       // Details optional
+    case 0: return !!char.race                // Race selected
+    case 1: return !!char.className           // Class selected
+    case 2: return true                       // Abilities always valid (defaults)
+    case 3: return !!char.background          // Background selected
+    case 4: return true                       // Equipment optional
+    case 5: return true                       // Spells optional (non-casters skip)
+    case 6: return true                       // Details optional
     default: return true
   }
 })
@@ -56,9 +52,9 @@ const isCurrentStepValid = computed((): boolean => {
 /** Map step index to validation i18n key */
 function validationKey(step: number): string {
   switch (step) {
-    case 1: return 'validation.selectRace'
-    case 2: return 'validation.selectClass'
-    case 4: return 'validation.selectBackground'
+    case 0: return 'validation.selectRace'
+    case 1: return 'validation.selectClass'
+    case 3: return 'validation.selectBackground'
     default: return 'validation.completeStep'
   }
 }
@@ -72,22 +68,16 @@ async function tryNextStep() {
 
   // WSG 3.8: Load only the data the next step needs before transitioning
   const nextStep = appStore.currentStep + 1
-  const variant = characterStore.character.variant
-  if (variant) {
-    isLoadingStep.value = true
-    await ensureStepData(variant, nextStep)
-    isLoadingStep.value = false
-  }
+  isLoadingStep.value = true
+  await ensureStepData('dnd5e', nextStep + 1)
+  isLoadingStep.value = false
   appStore.nextStep()
 }
 
 async function goPrevStep() {
   validationMessage.value = ''
   const prevStep = appStore.currentStep - 1
-  const variant = characterStore.character.variant
-  if (variant) {
-    await ensureStepData(variant, prevStep)
-  }
+  await ensureStepData('dnd5e', prevStep + 1)
   appStore.prevStep()
 }
 </script>

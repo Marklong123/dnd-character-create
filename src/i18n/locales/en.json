@@ -12,7 +12,7 @@
   },
   "home": {
     "welcome": "Welcome to Character Builder",
-    "description": "Create and manage your characters for D&D 5e, Brancalonia and Apocalisse. Works entirely in your browser, no sign-up required and no data sent to any server.",
+    "description": "Create and manage D&D 5e characters for Project Infinity. Works entirely in your browser, no sign-up required and no data sent to any server.",
     "startButton": "Create a New Character",
     "randomButton": "Random",
     "randomDnd5e": "Random D&D 5e",
@@ -26,8 +26,9 @@
     "parseError": "The file does not contain valid JSON. Make sure it is a .json file exported from this app.",
     "notObject": "The JSON file does not contain a valid character. It must be an object with character data.",
     "unknownError": "Unknown error while importing. Please try again.",
+    "onlyDnd5e": "Only D&D 5e character JSON can be imported.",
     "variantMismatch": "The imported character is for {actual}, not {expected}. It will be loaded with the correct variant.",
-    "MISSING_VARIANT": "Missing game variant (dnd5e, brancalonia, or apocalisse)",
+    "MISSING_VARIANT": "Missing D&D 5e game variant",
     "MISSING_RACE": "Missing character race",
     "MISSING_CLASSNAME": "Missing character class",
     "INVALID_LEVEL": "Level must be a number between 1 and 20",
@@ -120,6 +121,7 @@
     "ideals": "Ideals",
     "bonds": "Bonds",
     "flaws": "Flaws",
+    "random": "Random",
     "skillProficiencies": "Skill Proficiencies",
     "languageChoices": "language(s) of your choice"
   },
