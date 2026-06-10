@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useCharacterStore } from '@/stores/character'
-import { totalHp } from '@/utils/calculations'
 
 const { t } = useI18n()
 const characterStore = useCharacterStore()
@@ -10,13 +9,15 @@ const alignments = [
   'lg', 'ng', 'cg', 'ln', 'tn', 'cn', 'le', 'ne', 'ce',
 ]
 
-function updateLevel() {
-  const conMod = characterStore.abilityModifiers.con
-  characterStore.character.maxHp = totalHp(characterStore.character.hitDie, conMod, characterStore.character.level)
-  characterStore.character.currentHp = characterStore.character.maxHp
+function changeLevel(event: Event) {
+  const input = event.target as HTMLInputElement
+  const nextLevel = Math.min(Math.max(Number(input.value) || 1, 1), 20)
+  input.value = String(nextLevel)
+  if (nextLevel !== characterStore.character.level) {
+    characterStore.resetBuildAfterLevelChange(nextLevel)
+  }
 }
 
-updateLevel()
 </script>
 
 <template>
@@ -31,15 +32,10 @@ updateLevel()
       </div>
 
       <div>
-        <label for="player-name" class="block text-sm font-semibold text-stone-300 mb-1">{{ t('details.playerName') }}</label>
-        <input id="player-name" v-model="characterStore.character.playerName" type="text"
-          class="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 focus:border-amber-500 focus:outline-none" />
-      </div>
-
-      <div>
         <label for="char-level" class="block text-sm font-semibold text-stone-300 mb-1">{{ t('common.level') }}</label>
-        <input id="char-level" v-model.number="characterStore.character.level" type="number" min="1" max="20"
-          @change="updateLevel"
+        <input id="char-level" :value="characterStore.character.level" type="number" min="1" max="20"
+          @input="changeLevel"
+          @change="changeLevel"
           class="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 focus:border-amber-500 focus:outline-none" />
       </div>
 
@@ -53,18 +49,6 @@ updateLevel()
       </div>
     </div>
 
-    <div class="mt-6 bg-stone-800 border border-stone-700 rounded-lg p-4">
-      <h3 class="font-semibold text-stone-300 mb-2">{{ t('review.hp') }}</h3>
-      <div class="flex gap-6 text-sm">
-        <div>
-          <span class="text-stone-400">{{ t('review.maxHp') }}:</span>
-          <span class="text-amber-400 font-bold ml-1">{{ characterStore.character.maxHp }}</span>
-        </div>
-        <div>
-          <span class="text-stone-400">{{ t('review.hitDie') }}:</span>
-          <span class="text-stone-200 ml-1">{{ characterStore.character.level }}d{{ characterStore.character.hitDie }}</span>
-        </div>
-      </div>
-    </div>
+    <p class="mt-6 text-sm text-stone-500">{{ t('details.levelHint') }}</p>
   </section>
 </template>

@@ -7,6 +7,9 @@ import { resolve } from 'path'
 
 // Git hash for cache invalidation of localStorage game data
 const buildHash = execSync('git rev-parse --short HEAD').toString().trim()
+const dndYuanLastRoot = process.env.DND_YUAN_LAST_ROOT
+  ? resolve(process.env.DND_YUAN_LAST_ROOT)
+  : resolve(__dirname, '../test_engine/dnd_yuan_last')
 
 export default defineConfig({
   base: '/dnd-character-create/',
@@ -61,6 +64,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
+      '@yuan-config': resolve(dndYuanLastRoot, 'config'),
+    },
+  },
+  server: {
+    fs: {
+      allow: [__dirname, dndYuanLastRoot],
     },
   },
   build: {

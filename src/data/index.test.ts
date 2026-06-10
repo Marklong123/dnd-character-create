@@ -16,8 +16,14 @@ import {
   preloadVariantData,
 } from './index'
 import type { GameVariant } from '@/stores/app'
+import type { AbilityScores } from '@/stores/character'
+import type { Race, Subrace } from './dnd5e/races'
+import { modifier, proficiencyBonus, totalHp } from '@/utils/calculations'
+import { getAsiCount } from '@/utils/dndRules'
 
 const variants: GameVariant[] = ['dnd5e', 'brancalonia', 'apocalisse']
+const abilities: (keyof AbilityScores)[] = ['str', 'dex', 'con', 'int', 'wis', 'cha']
+type RaceChoice = { race: Race; subrace: Subrace | null }
 
 describe('data loader', () => {
   // Preload all variants before running tests
@@ -74,6 +80,72 @@ describe('data loader', () => {
       const hasSubclasses = classes.some(c => c.subclasses.length > 0)
       expect(hasSubclasses).toBe(true)
     })
+
+    it('covers every D&D 5e race/subrace, class, and level derived rule matrix', () => {
+      const raceChoices: RaceChoice[] = getRaces('dnd5e').flatMap<RaceChoice>(race => (
+        race.subraces.length
+          ? race.subraces.map(subrace => ({ race, subrace }))
+          : [{ race, subrace: null }]
+      ))
+      const classes = getClasses('dnd5e')
+      const abilityMods = { str: 0, dex: 0, con: 2, int: 3, wis: 2, cha: 3 }
+
+      expect(raceChoices.length).toBeGreaterThan(getRaces('dnd5e').length)
+      expect(classes).toHaveLength(12)
+
+      for (const { race, subrace } of raceChoices) {
+        const racialBonuses: Partial<AbilityScores> = {
+          ...race.abilityBonuses,
+        }
+        if (subrace) {
+          for (const [key, value] of Object.entries(subrace.abilityBonuses)) {
+            const ability = key as keyof AbilityScores
+            racialBonuses[ability] = (racialBonuses[ability] || 0) + (Number(value) || 0)
+          }
+        }
+
+        for (const cls of classes) {
+          for (let level = 1; level <= 20; level++) {
+            const conScore = 14 + (racialBonuses.con || 0)
+            const hp = totalHp(cls.hitDie, modifier(conScore), level)
+            const slots = getSpellSlots(cls.id, level)
+            const cantrips = getCantripsKnown(cls.id, level)
+            const spellsKnown = getSpellsKnownCount(cls.id, level, abilityMods)
+
+            expect(race.speed).toBeGreaterThan(0)
+            expect([6, 8, 10, 12]).toContain(cls.hitDie)
+            expect(hp).toBeGreaterThanOrEqual(1)
+            expect(proficiencyBonus(level)).toBe(Math.floor((level - 1) / 4) + 2)
+            expect(cls.savingThrows).toHaveLength(2)
+            for (const savingThrow of cls.savingThrows) {
+              expect(abilities).toContain(savingThrow)
+            }
+            expect(getAsiCount(cls.id, level)).toBeGreaterThanOrEqual(0)
+            if (cls.id === 'fighter' && level >= 6) {
+              expect(getAsiCount(cls.id, level)).toBeGreaterThan(getAsiCount('cleric', level))
+            }
+            if (cls.id === 'rogue' && level >= 10) {
+              expect(getAsiCount(cls.id, level)).toBeGreaterThan(getAsiCount('cleric', level))
+            }
+            if (level >= cls.subclassLevel) {
+              expect(cls.subclasses.length).toBeGreaterThan(0)
+            }
+            if (cls.spellcasting) {
+              expect(abilities).toContain(cls.spellcasting.ability)
+              expect(cantrips).toBeGreaterThanOrEqual(0)
+              expect(spellsKnown).toBeGreaterThanOrEqual(0)
+              if (level >= 2 || cls.spellcasting.casterType !== 'half') {
+                expect(Object.values(slots).reduce((sum, count) => sum + count, 0)).toBeGreaterThanOrEqual(0)
+              }
+            } else {
+              expect(cantrips).toBe(0)
+              expect(spellsKnown).toBe(0)
+              expect(slots).toEqual({})
+            }
+          }
+        }
+      }
+    })
   })
 
   describe('getBackgrounds', () => {
@@ -126,6 +198,12 @@ describe('data loader', () => {
       expect(spells.length).toBeGreaterThan(0)
       expect(spells[0]).toHaveProperty('name')
       expect(spells[0]).toHaveProperty('level')
+    })
+
+    it('filters D&D spells to the Project Infinity runtime spell list', () => {
+      const names = getSpells('dnd5e').map(spell => spell.name)
+      expect(names).toContain('Fire Bolt')
+      expect(names).not.toContain('Black Tentacles')
     })
   })
 

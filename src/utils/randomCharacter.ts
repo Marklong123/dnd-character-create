@@ -6,6 +6,7 @@ import { simpleWeapons, martialWeapons, armor as armorData } from '@/data/dnd5e/
 import { rollAbilityScores } from './diceRoller'
 import { modifier, totalHp, proficiencyBonus } from './calculations'
 import { pickRoleplayPreset } from '@/data/dnd5e/roleplayPresets'
+import { allocateAsiBonuses } from './dndRules'
 
 function pick<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]!
@@ -18,6 +19,15 @@ function pickN<T>(arr: readonly T[], n: number): T[] {
 
 function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+function abilityTotal(
+  ability: AbilityKey,
+  baseScores: AbilityScores,
+  racialBonuses: Partial<AbilityScores>,
+  asiBonuses: Partial<AbilityScores>,
+): number {
+  return baseScores[ability] + (racialBonuses[ability] || 0) + (asiBonuses[ability] || 0)
 }
 
 const FANTASY_NAMES = [
@@ -167,6 +177,14 @@ export function generateRandomCharacter(variant: GameVariant, forcedLevel?: numb
     }
   }
 
+  const asiBonuses = allocateAsiBonuses(
+    abilityScores,
+    racialBonuses,
+    cls.id,
+    level,
+    cls.primaryAbility,
+  )
+
   // Pick random background
   const backgrounds = getBackgrounds(variant)
   const bg = pick(backgrounds)
@@ -185,12 +203,12 @@ export function generateRandomCharacter(variant: GameVariant, forcedLevel?: numb
   const languages = [...raceLanguages, ...extraLanguages]
 
   // Calculate HP
-  const conTotal = abilityScores.con + (racialBonuses.con || 0)
+  const conTotal = abilityTotal('con', abilityScores, racialBonuses, asiBonuses)
   const conMod = modifier(conTotal)
   const maxHp = totalHp(cls.hitDie, conMod, level)
   const prof = proficiencyBonus(level)
-  const strMod = modifier(abilityScores.str + (racialBonuses.str || 0))
-  const dexMod = modifier(abilityScores.dex + (racialBonuses.dex || 0))
+  const strMod = modifier(abilityTotal('str', abilityScores, racialBonuses, asiBonuses))
+  const dexMod = modifier(abilityTotal('dex', abilityScores, racialBonuses, asiBonuses))
 
   // Equipment: starting equipment from class + background
   const equipment = [...cls.startingEquipment, ...bg.equipment]
@@ -226,12 +244,12 @@ export function generateRandomCharacter(variant: GameVariant, forcedLevel?: numb
 
     // Calculate ability modifiers for spell count
     const abilityMods = {
-      str: modifier(abilityScores.str + (racialBonuses.str || 0)),
-      dex: modifier(abilityScores.dex + (racialBonuses.dex || 0)),
+      str: modifier(abilityTotal('str', abilityScores, racialBonuses, asiBonuses)),
+      dex: modifier(abilityTotal('dex', abilityScores, racialBonuses, asiBonuses)),
       con: conMod,
-      int: modifier(abilityScores.int + (racialBonuses.int || 0)),
-      wis: modifier(abilityScores.wis + (racialBonuses.wis || 0)),
-      cha: modifier(abilityScores.cha + (racialBonuses.cha || 0)),
+      int: modifier(abilityTotal('int', abilityScores, racialBonuses, asiBonuses)),
+      wis: modifier(abilityTotal('wis', abilityScores, racialBonuses, asiBonuses)),
+      cha: modifier(abilityTotal('cha', abilityScores, racialBonuses, asiBonuses)),
     }
 
     // Select leveled spells
@@ -259,11 +277,15 @@ export function generateRandomCharacter(variant: GameVariant, forcedLevel?: numb
     className: cls.id,
     subclass: subclass?.id || '',
     level,
+    targetLevel: level,
+    asiPoints: 0,
+    baseScoresApplied: true,
     background: bg.id,
     alignment: pick(ALIGNMENTS),
     experiencePoints: 0,
     abilityScores,
     racialBonuses,
+    asiBonuses,
     skillProficiencies: allSkillIds,
     skillExpertise: [],
     savingThrowProficiencies: [...cls.savingThrows],

@@ -84,10 +84,22 @@ describe('useCharacterStore', () => {
       expect(store.profBonus).toBe(6)
     })
 
-    it('calculates armor class (10 + DEX mod)', () => {
+    it('calculates unarmored armor class from dexterity', () => {
       const store = useCharacterStore()
       store.character.abilityScores.dex = 16 // mod +3
       expect(store.armorClass).toBe(13)
+    })
+
+    it('calculates equipped armor class with armor and shield', () => {
+      const store = useCharacterStore()
+      store.character.className = 'cleric'
+      store.character.abilityScores.dex = 8 // mod -1
+      store.character.armor = 'Scale Mail'
+      store.character.shield = true
+      expect(store.armorClass).toBe(15)
+
+      store.character.armor = 'Chain Mail'
+      expect(store.armorClass).toBe(18)
     })
 
     it('calculates initiative from DEX mod', () => {
@@ -160,10 +172,34 @@ describe('useCharacterStore', () => {
     it('exports valid JSON', () => {
       const store = useCharacterStore()
       store.character.name = 'Test'
+      store.character.race = 'human'
+      store.character.className = 'fighter'
       const json = store.exportJson()
       const parsed = JSON.parse(json)
       expect(parsed.name).toBe('Test')
       expect(parsed.variant).toBe('dnd5e')
+    })
+
+    it('keeps exported JSON schema and rule identifiers in English while preserving user text', () => {
+      const store = useCharacterStore()
+      store.character.name = '中文名'
+      store.character.race = 'human'
+      store.character.className = 'fighter'
+      store.character.background = 'soldier'
+      store.character.personalityTraits = '手动输入的性格'
+      store.character.ideals = '手动输入的理想'
+      store.character.flaws = '手动输入的缺点'
+      const parsed = JSON.parse(store.exportJson())
+
+      expect(parsed.name).toBe('中文名')
+      expect(parsed.race).toBe('human')
+      expect(parsed.className).toBe('fighter')
+      expect(parsed.background).toBe('soldier')
+      expect(parsed.personalityTraits).toBe('手动输入的性格')
+      expect(parsed.ideals).toBe('手动输入的理想')
+      expect(parsed.flaws).toBe('手动输入的缺点')
+      expect(parsed['角色档案']).toBeUndefined()
+      expect(parsed['血统']).toBeUndefined()
     })
 
     it('imports valid character JSON', () => {
@@ -270,29 +306,38 @@ describe('useCharacterStore', () => {
     })
   })
 
-  describe('multiclass', () => {
-    it('isMulticlass is false for single class', () => {
+  describe('single-class runtime export', () => {
+    it('does not export the legacy classes array', () => {
       const store = useCharacterStore()
-      expect(store.isMulticlass).toBe(false)
+      store.character.race = 'human'
+      store.character.className = 'fighter'
+      store.character.classes = [{ classId: 'fighter', subclass: '', level: 1, hitDie: 10 }]
+      const exported = JSON.parse(store.exportJson())
+      expect(exported.classes).toBeUndefined()
     })
 
-    it('only works for dnd5e variant', () => {
+    it('does not export builder-only ability stage state', () => {
       const store = useCharacterStore()
-      store.character.variant = 'brancalonia'
+      store.character.name = 'Ready'
+      store.character.race = 'human'
       store.character.className = 'fighter'
-      store.addMulticlass('wizard')
-      expect(store.character.classes).toHaveLength(0)
+      store.character.background = 'soldier'
+      store.character.maxHp = 12
+      store.character.baseScoresApplied = true
+      const exported = JSON.parse(store.exportJson())
+      expect(exported.baseScoresApplied).toBeUndefined()
     })
 
-    it('does not add the same class twice', () => {
+    it('rejects imported multiclass characters', () => {
       const store = useCharacterStore()
-      store.character.variant = 'dnd5e'
-      store.character.className = 'fighter'
-      store.character.hitDie = 10
-      store.character.level = 3
-      store.addMulticlass('fighter') // same class
-      // classes should have just the primary class entry
-      expect(store.character.classes).toHaveLength(1)
+      const json = JSON.stringify({
+        ...makeMinimalCharacter(),
+        classes: [
+          { classId: 'fighter', subclass: '', level: 1, hitDie: 10 },
+          { classId: 'wizard', subclass: '', level: 1, hitDie: 6 },
+        ],
+      })
+      expect(() => store.importJson(json)).toThrow('VALIDATION:UNSUPPORTED_MULTICLASS')
     })
   })
 })

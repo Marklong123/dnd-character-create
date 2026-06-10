@@ -29,7 +29,7 @@ function acceptGdpr() {
       href="#main-content"
       class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-amber-500 focus:text-stone-900 focus:rounded focus:font-semibold"
     >
-      Skip to content
+      {{ t('a11y.skipToContent') }}
     </a>
     <AppHeader />
     <main id="main-content" class="container mx-auto px-4 py-6 flex-1" role="main">
@@ -42,11 +42,11 @@ function acceptGdpr() {
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-stone-900 font-semibold rounded-lg transition-colors no-underline text-sm"
-          aria-label="Buy me a coffee (opens PayPal)"
+          :aria-label="t('a11y.coffee')"
         >
           <span aria-hidden="true">☕</span> Buy me a coffee
         </a>
-        <nav class="flex flex-wrap items-center justify-center gap-3 text-xs text-stone-500" aria-label="Footer links">
+        <nav class="flex flex-wrap items-center justify-center gap-3 text-xs text-stone-500" :aria-label="t('a11y.footerLinks')">
           <span>🇪🇺 {{ t('footer.madeInEU') }}</span>
           <span aria-hidden="true">·</span>
           <router-link to="/privacy" class="hover:text-amber-400 transition-colors">{{ t('footer.privacy') }}</router-link>

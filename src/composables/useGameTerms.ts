@@ -1,5 +1,5 @@
 import { useI18n } from 'vue-i18n'
-import { translateGameTerm } from '@/i18n/gameTerms'
+import { translateGameDescription, translateGameTerm, translateRulesText } from '@/i18n/gameTerms'
 import type { GameTermCategory } from '@/i18n/gameTerms'
 
 /**
@@ -53,7 +53,7 @@ export function useGameTerms() {
   }
 
   /**
-   * Translate a race name to Italian.
+   * Translate a race name.
    * @param name - English race name (e.g., "Dwarf", "Gifted")
    */
   function raceName(name: string): string {
@@ -61,7 +61,7 @@ export function useGameTerms() {
   }
 
   /**
-   * Translate a subrace name to Italian.
+   * Translate a subrace name.
    * @param name - English subrace name (e.g., "Hill Dwarf", "Child of the Old World")
    */
   function subraceName(name: string): string {
@@ -69,7 +69,7 @@ export function useGameTerms() {
   }
 
   /**
-   * Translate a skill name to Italian.
+   * Translate a skill name.
    * @param name - English skill name (e.g., "Acrobatics", "Stealth")
    */
   function skill(name: string): string {
@@ -77,7 +77,7 @@ export function useGameTerms() {
   }
 
   /**
-   * Translate an armor/weapon proficiency label to Italian.
+   * Translate an armor/weapon proficiency label.
    * @param name - English proficiency label (e.g., "light", "martial", "shields")
    */
   function proficiency(name: string): string {
@@ -85,7 +85,7 @@ export function useGameTerms() {
   }
 
   /**
-   * Translate a class feature name to Italian.
+   * Translate a class feature name.
    * @param name - English feature name (e.g., "Rage", "Sneak Attack")
    */
   function feature(name: string): string {
@@ -102,7 +102,7 @@ export function useGameTerms() {
   }
 
   /**
-   * Translate a language name to Italian.
+   * Translate a language name.
    * @param name - English language name (e.g., "Common", "Elvish")
    */
   function language(name: string): string {
@@ -110,7 +110,7 @@ export function useGameTerms() {
   }
 
   /**
-   * Translate a subclass name to Italian.
+   * Translate a subclass name.
    * @param name - Subclass ID (e.g., "berserker", "school-of-evocation")
    */
   function subclassName(name: string): string {
@@ -118,12 +118,65 @@ export function useGameTerms() {
   }
 
   /**
-   * Translate an equipment item name to Italian.
+   * Translate an equipment item name.
    * @param name - Equipment item string (e.g., "Longsword", "Explorer's Pack")
    */
   function equipment(name: string): string {
     return translate(name, 'equipment')
   }
 
-  return { weapon, armorName, spell, school, damageType, pack, background, className, raceName, subraceName, skill, proficiency, feature, trait, language, subclassName, equipment }
+  function ability(name: string): string {
+    return translate(name, 'ability')
+  }
+
+  function casterType(name: string): string {
+    return translate(name, 'casterType')
+  }
+
+  function size(name: string): string {
+    return translate(name, 'size')
+  }
+
+  function classFeatureDescription(name: string, fallback: string): string {
+    return translateGameDescription(name, fallback, locale.value, 'classFeature')
+  }
+
+  function backgroundFeatureDescription(name: string, fallback: string): string {
+    return translateGameDescription(name, fallback, locale.value, 'backgroundFeature')
+  }
+
+  function spellDescription(name: string, fallback: string): string {
+    return translateGameDescription(name, fallback, locale.value, 'spell')
+  }
+
+  function rulesText(text: string): string {
+    return translateRulesText(text, locale.value)
+  }
+
+  return {
+    weapon,
+    armorName,
+    spell,
+    school,
+    damageType,
+    pack,
+    background,
+    className,
+    raceName,
+    subraceName,
+    skill,
+    proficiency,
+    feature,
+    trait,
+    language,
+    subclassName,
+    equipment,
+    ability,
+    casterType,
+    size,
+    classFeatureDescription,
+    backgroundFeatureDescription,
+    spellDescription,
+    rulesText,
+  }
 }

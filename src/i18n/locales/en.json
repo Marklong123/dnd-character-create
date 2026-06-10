@@ -10,6 +10,14 @@
     "characters": "Archive",
     "blog": "Templates"
   },
+  "a11y": {
+    "skipToContent": "Skip to content",
+    "stepNavigation": "Character creation steps",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "footerLinks": "Footer links",
+    "coffee": "Buy me a coffee (opens PayPal)"
+  },
   "home": {
     "welcome": "Welcome to Character Builder",
     "description": "Create and manage D&D 5e characters for Project Infinity. Works entirely in your browser, no sign-up required and no data sent to any server.",
@@ -42,20 +50,21 @@
     "INVALID_SPELLSKNOWN": "Known spells must be a list",
     "INVALID_SPELLSPREPARED": "Prepared spells must be a list",
     "INVALID_WEAPONS": "Weapons must be a list",
+    "UNSUPPORTED_MULTICLASS": "Multiclass characters are not supported by Project Infinity export",
     "WARN_NO_NAME": "The character has no name",
     "WARN_NO_BACKGROUND": "The character has no background",
     "WARN_NO_HP": "Hit points have not been calculated"
   },
   "steps": {
     "variant": "Variant",
-    "race": "Race",
-    "class": "Class",
-    "abilities": "Abilities",
-    "background": "Background",
-    "equipment": "Equipment",
-    "spells": "Spells",
-    "details": "Details",
-    "review": "Review"
+    "race": "Ancestry",
+    "class": "Class Training",
+    "abilities": "Ability Scores",
+    "background": "Origin",
+    "equipment": "Gear",
+    "spells": "Spellcasting",
+    "details": "Profile",
+    "review": "Character Sheet"
   },
   "variant": {
     "title": "Choose Game Variant",
@@ -73,7 +82,7 @@
     "apocalisseFeatures": "12 archetypes • 6 origins • Level 1-20"
   },
   "race": {
-    "title": "Choose Race",
+    "title": "Choose Ancestry",
     "abilityBonuses": "Ability Score Bonuses",
     "traits": "Racial Traits",
     "speed": "Speed",
@@ -82,7 +91,7 @@
     "subrace": "Subrace"
   },
   "class": {
-    "title": "Choose Class",
+    "title": "Class Training",
     "hitDie": "Hit Die",
     "primaryAbility": "Primary Ability",
     "savingThrows": "Saving Throws",
@@ -93,18 +102,35 @@
     "multiclass": "Multiclass",
     "addClass": "Add Class",
     "removeClass": "Remove",
-    "selectClassToAdd": "Select a class to add"
+    "selectClassToAdd": "Select a class to add",
+    "requiredFromLevel": "required from level {level}",
+    "unlocksAtLevel": "unlocks at level {level}"
   },
   "abilities": {
-    "title": "Generate Ability Scores",
+    "title": "Ability Scores",
     "method": "Generation Method",
     "standardArray": "Standard Array",
     "pointBuy": "Point Buy",
     "roll": "Roll Dice",
     "pointsRemaining": "Points remaining: {points}",
-    "rollDice": "Roll 4d6",
     "reroll": "Reroll All",
     "assign": "Assign to Abilities",
+    "stage": "Stage",
+    "baseStageTitle": "Base Scores",
+    "baseStageHint": "Choose and apply your starting ability scores before spending level bonuses.",
+    "levelBonusStageTitle": "Level Bonuses",
+    "levelBonusStageHint": "Spend level-based ASI points after the base scores are locked in.",
+    "applyBaseScores": "Apply Base Scores",
+    "editBaseScores": "Edit Base Scores",
+    "baseScoresApplied": "Base scores applied",
+    "incompleteBaseScores": "Assign all six base scores before continuing.",
+    "noAsiHint": "This level grants no Ability Score Improvement points.",
+    "current": "current",
+    "asiTitle": "Ability Score Improvement",
+    "asiHint": "Spend these level-based ASI points after choosing base scores. Feats are not supported in this version.",
+    "asiRemaining": "ASI remaining: {points}",
+    "base": "Base",
+    "asiBonus": "ASI Bonus",
     "modifier": "Modifier",
     "racialBonus": "Racial Bonus",
     "total": "Total",
@@ -116,17 +142,20 @@
     "cha": "Charisma"
   },
   "background": {
-    "title": "Choose Background",
+    "title": "Choose Origin",
     "personalityTraits": "Personality Traits",
     "ideals": "Ideals",
     "bonds": "Bonds",
     "flaws": "Flaws",
     "random": "Random",
+    "randomAll": "Random All",
+    "roleplayDetails": "Roleplay Details",
+    "roleplayHint": "Optional prompts for personality and table roleplay. You can skip these or use Random for a quick starting point.",
     "skillProficiencies": "Skill Proficiencies",
     "languageChoices": "language(s) of your choice"
   },
   "equipment": {
-    "title": "Equipment",
+    "title": "Gear",
     "startingPack": "Starting Pack",
     "manual": "Manual Selection",
     "weapons": "Weapons",
@@ -136,10 +165,18 @@
     "tools": "Tools",
     "coins": "Coins",
     "other": "Other Equipment",
-    "addItem": "Add item..."
+    "addItem": "Add item...",
+    "budget": "Budget",
+    "spent": "Spent",
+    "remaining": "Remaining",
+    "strictPurchaseHint": "Class starting wealth and background gold define your budget. Background equipment is granted for free; purchased gear cannot exceed the budget.",
+    "backgroundGrant": "Background Equipment",
+    "packs": "Packs",
+    "currencyGp": "{amount} gp",
+    "armorClassValue": "AC {value}"
   },
   "spells": {
-    "title": "Spells",
+    "title": "Spellcasting",
     "cantrips": "Cantrips",
     "knownSpells": "Known Spells",
     "preparedSpells": "Prepared Spells",
@@ -159,10 +196,14 @@
     "notACasterMulticlass": "None of your classes have spellcasting abilities.",
     "pressNext": "Press Next to continue.",
     "pactMagic": "Pact Magic",
-    "allLevels": "All levels"
+    "allLevels": "All levels",
+    "maxSpellLevel": "Max Spell Level",
+    "spellbook": "Spellbook",
+    "levelShort": "Lv.{level}",
+    "slotCount": "{count} slot(s)"
   },
   "details": {
-    "title": "Character Details",
+    "title": "Profile",
     "name": "Character Name",
     "playerName": "Player Name",
     "age": "Age",
@@ -191,10 +232,11 @@
     "selectVirtue": "Choose Virtue",
     "selectSin": "Choose Sin",
     "sessionNotes": "Session Notes",
-    "sessionNotesPlaceholder": "Jot down notes from your sessions, reminders, goals..."
+    "sessionNotesPlaceholder": "Jot down notes from your sessions, reminders, goals...",
+    "levelHint": "Choose the character's final starting level now. Changing it later will clear race, class, equipment, spells, and other later choices."
   },
   "review": {
-    "title": "Character Summary",
+    "title": "Character Sheet",
     "export": "Export",
     "exportPdf": "Export PDF Sheet",
     "exportCustomPdf": "Export Custom PDF",
@@ -217,6 +259,12 @@
     "charRace": "Race",
     "charBackground": "Background",
     "armorLabel": "Armor",
+    "levelPlanning": "Level Planning",
+    "targetLevel": "Target Level",
+    "levelToTarget": "Level to Target",
+    "levelPlanningHint": "Create the base character first, then level up here. Finish subclass choices, ASI points, and spells before exporting.",
+    "asiRemaining": "ASI points remaining: {count}",
+    "exportBlocked": "Project Infinity export is blocked",
     "shieldBonus": "+ Shield (+2 AC)",
     "noArmor": "None",
     "saveSuccess": "Character saved successfully to browser!",
@@ -261,9 +309,12 @@
     "stepProgress": "Step {current} of {total}"
   },
   "validation": {
-    "selectRace": "Select a race before continuing",
+    "validLevel": "Choose a level from 1 to 20 before continuing",
+    "selectRace": "Select an ancestry before continuing",
     "selectClass": "Select a class before continuing",
-    "selectBackground": "Select a background before continuing",
+    "spendAsi": "Apply base scores, spend all ASI points, and keep every final ability score at 20 or lower before continuing",
+    "selectBackground": "Select an origin before continuing",
+    "selectRequiredSpells": "Choose the required cantrips and spells before continuing",
     "completeStep": "Complete this step before continuing"
   },
   "footer": {

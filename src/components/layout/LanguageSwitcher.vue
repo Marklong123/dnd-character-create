@@ -7,8 +7,8 @@ const { locale } = useI18n()
 const open = ref(false)
 
 const languages = [
-  { code: 'it', label: 'Italiano', flag: 'IT' },
   { code: 'en', label: 'English', flag: 'EN' },
+  { code: 'zh', label: '中文', flag: '中' },
 ]
 
 async function selectLang(code: string) {
@@ -32,7 +32,7 @@ function handleBlur() {
       class="flex items-center gap-1 px-2 py-1 rounded bg-stone-700 hover:bg-stone-600 text-sm font-medium text-stone-200 transition-colors cursor-pointer"
       :aria-expanded="open"
       aria-haspopup="listbox"
-      :aria-label="locale === 'it' ? 'Cambia lingua' : 'Change language'"
+      :aria-label="locale === 'zh' ? '切换语言' : 'Change language'"
     >
       {{ languages.find(l => l.code === locale)?.flag ?? 'EN' }}
       <svg class="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -42,7 +42,7 @@ function handleBlur() {
     <ul
       v-if="open"
       role="listbox"
-      :aria-label="locale === 'it' ? 'Lingue disponibili' : 'Available languages'"
+      :aria-label="locale === 'zh' ? '可用语言' : 'Available languages'"
       class="absolute right-0 mt-1 bg-stone-700 border border-stone-600 rounded shadow-lg z-50 min-w-[140px] py-1"
     >
       <li

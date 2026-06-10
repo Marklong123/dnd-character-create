@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCharacterStore } from '@/stores/character'
 import { getRaces } from '@/data'
-import type { Race } from '@/data/dnd5e/races'
+import type { Race, Subrace } from '@/data/dnd5e/races'
 import { formatModifier, feetToMeters } from '@/utils/calculations'
 import { useGameTerms } from '@/composables/useGameTerms'
 import VariantPromo from '@/components/shared/VariantPromo.vue'
@@ -16,38 +16,51 @@ const races = computed(() => getRaces(characterStore.character.variant))
 const selectedRace = ref<Race | null>(null)
 const selectedSubrace = ref<string>('')
 
-function selectRace(race: Race) {
-  selectedRace.value = race
-  selectedSubrace.value = race.subraces?.[0]?.id || ''
+const selectedSubraceData = computed<Subrace | null>(() =>
+  selectedRace.value?.subraces.find(subrace => subrace.id === selectedSubrace.value) || null
+)
+
+const selectedAbilityBonuses = computed(() => characterStore.character.racialBonuses)
+
+const selectedTraits = computed(() => [
+  ...(selectedRace.value?.traits || []),
+  ...(selectedSubraceData.value?.traits || []),
+])
+
+function applyRaceSelection(race: Race, subraceId: string) {
   characterStore.character.race = race.id
-  characterStore.character.subrace = selectedSubrace.value
-  // Apply racial bonuses
-  characterStore.character.racialBonuses = { ...race.abilityBonuses }
-  if (selectedSubrace.value && race.subraces) {
-    const sub = race.subraces.find(s => s.id === selectedSubrace.value)
-    if (sub?.abilityBonuses) {
-      for (const [key, val] of Object.entries(sub.abilityBonuses)) {
-        const k = key as keyof typeof characterStore.character.racialBonuses
-        characterStore.character.racialBonuses[k] = (characterStore.character.racialBonuses[k] || 0) + (val || 0)
-      }
+  characterStore.character.subrace = subraceId
+
+  const racialBonuses = { ...race.abilityBonuses }
+  const subrace = race.subraces.find(s => s.id === subraceId)
+  if (subrace?.abilityBonuses) {
+    for (const [key, val] of Object.entries(subrace.abilityBonuses)) {
+      const k = key as keyof typeof racialBonuses
+      racialBonuses[k] = (racialBonuses[k] || 0) + (val || 0)
     }
   }
+
+  characterStore.character.racialBonuses = racialBonuses
   characterStore.character.speed = race.speed
   characterStore.character.languages = [...race.languages]
 }
 
+function selectRace(race: Race) {
+  selectedRace.value = race
+  selectedSubrace.value = race.subraces?.[0]?.id || ''
+  applyRaceSelection(race, selectedSubrace.value)
+}
+
 function selectSubrace(subraceId: string) {
+  if (!selectedRace.value) return
   selectedSubrace.value = subraceId
-  characterStore.character.subrace = subraceId
-  if (selectedRace.value) {
-    selectRace(selectedRace.value)
-  }
+  applyRaceSelection(selectedRace.value, subraceId)
 }
 
 function bonusString(bonuses: Record<string, number>): string {
   return Object.entries(bonuses)
     .filter(([, v]) => v !== 0)
-    .map(([k, v]) => `${k.toUpperCase()} ${formatModifier(v)}`)
+    .map(([k, v]) => `${gt.ability(k)} ${formatModifier(v)}`)
     .join(', ')
 }
 </script>
@@ -69,7 +82,7 @@ function bonusString(bonuses: Record<string, number>): string {
       >
         <h3 class="font-bold text-amber-400">{{ gt.raceName(race.name) }}</h3>
         <p class="text-xs text-stone-400 mt-1">{{ bonusString(race.abilityBonuses) }}</p>
-        <p class="text-xs text-stone-500 mt-1">{{ t('race.speed') }}: {{ feetToMeters(race.speed) }}m &bull; {{ race.size }}</p>
+        <p class="text-xs text-stone-500 mt-1">{{ t('race.speed') }}: {{ feetToMeters(race.speed) }}m &bull; {{ gt.size(race.size) }}</p>
       </button>
     </div>
 
@@ -80,7 +93,7 @@ function bonusString(bonuses: Record<string, number>): string {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
         <div>
           <h4 class="font-semibold text-stone-300 mb-1">{{ t('race.abilityBonuses') }}</h4>
-          <p class="text-stone-400">{{ bonusString(selectedRace.abilityBonuses) }}</p>
+          <p class="text-stone-400">{{ bonusString(selectedAbilityBonuses) }}</p>
         </div>
         <div>
           <h4 class="font-semibold text-stone-300 mb-1">{{ t('race.speed') }}</h4>
@@ -88,7 +101,7 @@ function bonusString(bonuses: Record<string, number>): string {
         </div>
         <div>
           <h4 class="font-semibold text-stone-300 mb-1">{{ t('race.size') }}</h4>
-          <p class="text-stone-400">{{ selectedRace.size }}</p>
+          <p class="text-stone-400">{{ gt.size(selectedRace.size) }}</p>
         </div>
         <div>
           <h4 class="font-semibold text-stone-300 mb-1">{{ t('race.languages') }}</h4>
@@ -96,10 +109,10 @@ function bonusString(bonuses: Record<string, number>): string {
         </div>
       </div>
 
-      <div v-if="selectedRace.traits.length" class="mt-4">
+      <div v-if="selectedTraits.length" class="mt-4">
         <h4 class="font-semibold text-stone-300 mb-1">{{ t('race.traits') }}</h4>
         <ul class="text-stone-400 text-sm space-y-1">
-          <li v-for="trait in selectedRace.traits" :key="trait">&bull; {{ gt.trait(trait) }}</li>
+          <li v-for="trait in selectedTraits" :key="trait">&bull; {{ gt.trait(trait) }}</li>
         </ul>
       </div>
 

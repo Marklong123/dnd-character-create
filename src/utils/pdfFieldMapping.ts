@@ -2,6 +2,7 @@ import type { CharacterData, AbilityScores } from '@/stores/character'
 import { modifier, proficiencyBonus, formatModifier, spellSaveDC, spellAttackBonus, feetToMeters } from './calculations'
 import { apocalisseRules } from '@/data/apocalisse/rules'
 import { classNamesIt, brancaloniaClassNamesIt, apocalisseClassNamesIt, raceNamesIt, subraceNamesIt, backgroundNamesIt } from '@/i18n/gameTerms'
+import { calculateCharacterArmorClass } from './armorClass'
 
 /** Capitalize a class ID for English display (e.g., "barbarian" → "Barbarian") */
 function capitalizeId(id: string): string {
@@ -49,7 +50,7 @@ function pdfBackgroundName(bgId: string, variant: string): string {
   return bgId.split(/[-\s]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 }
 function totalAbility(char: CharacterData, ability: keyof AbilityScores): number {
-  return char.abilityScores[ability] + (char.racialBonuses[ability] || 0)
+  return char.abilityScores[ability] + (char.racialBonuses[ability] || 0) + (char.asiBonuses?.[ability] || 0)
 }
 
 function abilityMod(char: CharacterData, ability: keyof AbilityScores): number {
@@ -75,14 +76,7 @@ export function getDnd5eFieldMapping(char: CharacterData): Record<string, string
 
   // Basic Info
   fields['CharacterName'] = char.name
-  const classes = char.classes ?? []
-  if (classes.length >= 2) {
-    fields['ClassLevel'] = classes
-      .map(c => `${pdfClassName(c.classId, char.variant)} ${c.level}`)
-      .join(' / ')
-  } else {
-    fields['ClassLevel'] = `${pdfClassName(char.className, char.variant)} ${char.level}`
-  }
+  fields['ClassLevel'] = `${pdfClassName(char.className, char.variant)} ${char.level}`
   fields['Background'] = pdfBackgroundName(char.background, char.variant)
   fields['PlayerName'] = char.playerName
   const raceDisplay = pdfRaceName(char.race, char.variant)
@@ -121,18 +115,13 @@ export function getDnd5eFieldMapping(char: CharacterData): Record<string, string
   }
 
   // Combat Stats
-  fields['AC'] = String(10 + abilityMod(char, 'dex'))
+  fields['AC'] = String(calculateCharacterArmorClass(char))
   fields['Initiative'] = String(abilityMod(char, 'dex'))
   fields['Speed'] = `${feetToMeters(char.speed)}m`
   fields['HPMax'] = String(char.maxHp)
   fields['HPCurrent'] = String(char.currentHp || char.maxHp)
   fields['HPTemp'] = String(char.tempHp || '')
-  const hdClasses = char.classes ?? []
-  if (hdClasses.length >= 2) {
-    fields['HDTotal'] = hdClasses.map(c => `${c.level}d${c.hitDie}`).join(' + ')
-  } else {
-    fields['HDTotal'] = `${char.level}d${char.hitDie}`
-  }
+  fields['HDTotal'] = `${char.level}d${char.hitDie}`
   fields['HD'] = `${char.level}d${char.hitDie}`
   fields['ProfBonus'] = String(prof)
   fields['Passive'] = String(10 + skillBonus(char, 'perception', 'wis'))

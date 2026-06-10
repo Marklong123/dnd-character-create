@@ -22,6 +22,7 @@ const COMPACT_KEYS: Record<string, string> = {
   alignment: 'al',
   abilityScores: 'as',
   racialBonuses: 'rb',
+  asiBonuses: 'ab',
   skillProficiencies: 'sp',
   savingThrowProficiencies: 'st',
   hitDie: 'hd',
@@ -51,7 +52,6 @@ const COMPACT_KEYS: Record<string, string> = {
   sin: 'si',
   humanity: 'hu',
   sessionNotes: 'nt',
-  classes: 'cl',
 }
 
 const REVERSE_KEYS: Record<string, string> = Object.fromEntries(

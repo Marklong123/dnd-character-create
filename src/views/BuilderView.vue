@@ -3,8 +3,9 @@ import { defineAsyncComponent, computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import { useCharacterStore } from '@/stores/character'
-import { ensureStepData } from '@/data'
+import { ensureStepData, getClasses } from '@/data'
 import StepNavigation from '@/components/layout/StepNavigation.vue'
+import { isRequiredSpellSelectionComplete } from '@/utils/characterValidation'
 
 const { t } = useI18n()
 const appStore = useAppStore()
@@ -18,17 +19,17 @@ onMounted(async () => {
 
 // WSG 3.8: Defer loading of non-critical resources — lazy load wizard steps
 const steps = [
+  defineAsyncComponent(() => import('@/components/steps/Step8Details.vue')),
   defineAsyncComponent(() => import('@/components/steps/Step2Race.vue')),
   defineAsyncComponent(() => import('@/components/steps/Step3Class.vue')),
   defineAsyncComponent(() => import('@/components/steps/Step4Abilities.vue')),
   defineAsyncComponent(() => import('@/components/steps/Step5Background.vue')),
   defineAsyncComponent(() => import('@/components/steps/Step6Equipment.vue')),
   defineAsyncComponent(() => import('@/components/steps/Step7Spells.vue')),
-  defineAsyncComponent(() => import('@/components/steps/Step8Details.vue')),
   defineAsyncComponent(() => import('@/components/steps/Step9Review.vue')),
 ]
 
-const stepKeys = ['race', 'class', 'abilities', 'background', 'equipment', 'spells', 'details', 'review']
+const stepKeys = ['details', 'race', 'class', 'abilities', 'background', 'equipment', 'spells', 'review']
 
 // ─── Step Validation ──────────────────────────────────────────────────────
 const validationMessage = ref('')
@@ -38,13 +39,20 @@ const isLoadingStep = ref(false)
 const isCurrentStepValid = computed((): boolean => {
   const char = characterStore.character
   switch (appStore.currentStep) {
-    case 0: return !!char.race                // Race selected
-    case 1: return !!char.className           // Class selected
-    case 2: return true                       // Abilities always valid (defaults)
-    case 3: return !!char.background          // Background selected
-    case 4: return true                       // Equipment optional
-    case 5: return true                       // Spells optional (non-casters skip)
-    case 6: return true                       // Details optional
+    case 0: return Number.isFinite(char.level) && char.level >= 1 && char.level <= 20
+    case 1: return !!char.race                // Race selected
+    case 2: {                                 // Class selected
+      const cls = getClasses(char.variant).find(c => c.id === char.className)
+      if (!cls) return false
+      if (cls.subclasses.length > 0 && char.level >= cls.subclassLevel) return !!char.subclass
+      return true
+    }
+    case 3: return !!char.baseScoresApplied && (char.asiPoints || 0) === 0 && (['str', 'dex', 'con', 'int', 'wis', 'cha'] as const).every(
+      ability => characterStore.totalAbilityScore(ability) <= 20
+    )
+    case 4: return !!char.background          // Background selected
+    case 5: return true                       // Equipment optional
+    case 6: return isRequiredSpellSelectionComplete(char)
     default: return true
   }
 })
@@ -52,9 +60,12 @@ const isCurrentStepValid = computed((): boolean => {
 /** Map step index to validation i18n key */
 function validationKey(step: number): string {
   switch (step) {
-    case 0: return 'validation.selectRace'
-    case 1: return 'validation.selectClass'
-    case 3: return 'validation.selectBackground'
+    case 0: return 'validation.validLevel'
+    case 1: return 'validation.selectRace'
+    case 2: return 'validation.selectClass'
+    case 3: return 'validation.spendAsi'
+    case 4: return 'validation.selectBackground'
+    case 6: return 'validation.selectRequiredSpells'
     default: return 'validation.completeStep'
   }
 }
@@ -65,6 +76,7 @@ async function tryNextStep() {
     return
   }
   validationMessage.value = ''
+  characterStore.recomputeBuildDerivedState()
 
   // WSG 3.8: Load only the data the next step needs before transitioning
   const nextStep = appStore.currentStep + 1

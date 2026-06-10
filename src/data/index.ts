@@ -10,6 +10,7 @@ import type { BrancaloniaSubclass } from './brancalonia/classes'
 import type { BrancaloniaRules, WhacksLevel } from './brancalonia/rules'
 import type { ApocalisseSubclass } from './apocalisse/classes'
 import type { ApocalisseRules } from './apocalisse/rules'
+import { filterRuntimeSupportedSpells } from './runtimeSpellAllowlist'
 
 // ─── Build Hash for Cache Invalidation ──────────────────────────────────────
 declare const __BUILD_HASH__: string
@@ -136,10 +137,14 @@ function ensureDnd5eSpells(): Promise<void> {
   if (_dnd5eSpells) return Promise.resolve()
   if (_pDnd5eSpells) return _pDnd5eSpells
   const cached = lsGet<Spell[]>('dnd5e-spells')
-  if (cached) { _dnd5eSpells = cached; return Promise.resolve() }
+  if (cached) {
+    _dnd5eSpells = filterRuntimeSupportedSpells(cached)
+    return Promise.resolve()
+  }
   _pDnd5eSpells = import('./dnd5e/spells').then(m => {
-    _dnd5eSpells = m.spells
-    lsSet('dnd5e-spells', m.spells)
+    const supportedSpells = filterRuntimeSupportedSpells(m.spells)
+    _dnd5eSpells = supportedSpells
+    lsSet('dnd5e-spells', supportedSpells)
   })
   return _pDnd5eSpells
 }
@@ -294,34 +299,30 @@ export async function ensureStepData(variant: GameVariant, step: number): Promis
   const loads: Promise<void>[] = []
 
   switch (step) {
-    case 1: // Race
+    case 1: // Details
+      break
+    case 2: // Race
       if (variant === 'brancalonia') loads.push(ensureBrancaRaces())
       else if (variant === 'apocalisse') loads.push(ensureApoRaces())
       else loads.push(ensureDnd5eRaces())
       break
-    case 2: // Class
+    case 3: // Class
       loads.push(ensureDnd5eClasses())
       if (variant === 'brancalonia') loads.push(ensureBrancaClasses())
       if (variant === 'apocalisse') loads.push(ensureApoClasses())
       break
-    case 3: // Abilities — no data needed
+    case 4: // Abilities — no data needed
       break
-    case 4: // Background
+    case 5: // Background
       if (variant === 'brancalonia') loads.push(ensureBrancaBackgrounds())
       else if (variant === 'apocalisse') loads.push(ensureApoBackgrounds())
       else loads.push(ensureDnd5eBackgrounds())
       break
-    case 5: // Equipment
+    case 6: // Equipment
       loads.push(ensureDnd5eEquipment())
       break
-    case 6: // Spells
+    case 7: // Spells
       loads.push(ensureDnd5eSpells(), ensureDnd5eRules(), ensureDnd5eClasses())
-      break
-    case 7: // Details
-      // Races needed for size derivation
-      if (variant === 'brancalonia') loads.push(ensureBrancaRaces(), ensureBrancaRules())
-      else if (variant === 'apocalisse') loads.push(ensureApoRaces(), ensureApoRules())
-      else loads.push(ensureDnd5eRaces())
       break
     case 8: // Review — ensure everything
       loads.push(ensureAllForVariant(variant))

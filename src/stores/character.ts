@@ -1,8 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import type { GameVariant } from './app'
-import { modifier, proficiencyBonus, hpPerLevel } from '@/utils/calculations'
+import { modifier, proficiencyBonus, hpPerLevel, totalHp } from '@/utils/calculations'
 import { getMaxLevel, getClasses } from '@/data'
+import { averageStartingGold } from '@/data/dnd5e/equipmentPrices'
+import { validateCharacterForExport } from '@/utils/characterValidation'
+import { getAsiCount, sumAbilityScores, zeroAbilityScores } from '@/utils/dndRules'
+import { calculateCharacterArmorClass } from '@/utils/armorClass'
 
 export interface AbilityScores {
   str: number
@@ -36,11 +40,15 @@ export interface CharacterData {
   className: string
   subclass: string
   level: number
+  targetLevel?: number
+  asiPoints?: number
+  baseScoresApplied?: boolean
   background: string
   alignment: string
   experiencePoints: number
   abilityScores: AbilityScores
   racialBonuses: Partial<AbilityScores>
+  asiBonuses?: AbilityScores
   skillProficiencies: string[]
   skillExpertise: string[]
   savingThrowProficiencies: string[]
@@ -50,7 +58,10 @@ export interface CharacterData {
   armor: string
   shield: boolean
   equipment: string[]
+  purchasedEquipment?: string[]
   coins: { cp: number; sp: number; ep: number; gp: number; pp: number }
+  equipmentBudgetGp?: number
+  equipmentSpentGp?: number
   personalityTraits: string
   ideals: string
   bonds: string
@@ -88,7 +99,7 @@ export interface CharacterData {
   humanity: number
   // Session notes
   sessionNotes: string
-  // Multiclass (D&D 5e only) — empty array = single class
+  // Legacy import compatibility only. Project Infinity runtime supports single-class characters.
   classes: ClassEntry[]
 }
 
@@ -103,11 +114,15 @@ function createEmptyCharacter(): CharacterData {
     className: '',
     subclass: '',
     level: 1,
+    targetLevel: 1,
+    asiPoints: 0,
+    baseScoresApplied: false,
     background: '',
     alignment: '',
     experiencePoints: 0,
     abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
     racialBonuses: {},
+    asiBonuses: zeroAbilityScores(),
     skillProficiencies: [],
     skillExpertise: [],
     savingThrowProficiencies: [],
@@ -117,7 +132,10 @@ function createEmptyCharacter(): CharacterData {
     armor: '',
     shield: false,
     equipment: [],
+    purchasedEquipment: [],
     coins: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 },
+    equipmentBudgetGp: 0,
+    equipmentSpentGp: 0,
     personalityTraits: '',
     ideals: '',
     bonds: '',
@@ -156,6 +174,18 @@ function createEmptyCharacter(): CharacterData {
   }
 }
 
+function normalizeAbilityScores(value: unknown, fallback = 0): AbilityScores {
+  const source = (value && typeof value === 'object') ? value as Partial<Record<keyof AbilityScores, unknown>> : {}
+  return {
+    str: Number(source.str) || fallback,
+    dex: Number(source.dex) || fallback,
+    con: Number(source.con) || fallback,
+    int: Number(source.int) || fallback,
+    wis: Number(source.wis) || fallback,
+    cha: Number(source.cha) || fallback,
+  }
+}
+
 export const useCharacterStore = defineStore('character', () => {
   const character = ref<CharacterData>(createEmptyCharacter())
   const savedCharacters = ref<CharacterData[]>([])
@@ -164,8 +194,16 @@ export const useCharacterStore = defineStore('character', () => {
   // Runs as a watcher so it fires AFTER pinia-plugin-persistedstate hydrates from localStorage
   function migrateCharacters() {
     for (const c of savedCharacters.value) {
-      if ((c as any).sessionNotes === undefined) (c as any).sessionNotes = ''
-      if (!Array.isArray((c as any).classes)) (c as any).classes = []
+      const saved = c as any
+      if (saved.sessionNotes === undefined) saved.sessionNotes = ''
+      if (!Array.isArray(saved.classes)) saved.classes = []
+      if (typeof saved.targetLevel !== 'number') saved.targetLevel = saved.level || 1
+      if (typeof saved.asiPoints !== 'number') saved.asiPoints = 0
+      if (typeof saved.baseScoresApplied !== 'boolean') saved.baseScoresApplied = true
+      saved.asiBonuses = normalizeAbilityScores(saved.asiBonuses, 0)
+      if (typeof saved.equipmentBudgetGp !== 'number') saved.equipmentBudgetGp = 0
+      if (typeof saved.equipmentSpentGp !== 'number') saved.equipmentSpentGp = 0
+      if (!Array.isArray(saved.purchasedEquipment)) saved.purchasedEquipment = []
     }
   }
   migrateCharacters()
@@ -183,10 +221,7 @@ export const useCharacterStore = defineStore('character', () => {
 
   const profBonus = computed(() => proficiencyBonus(character.value.level))
 
-  const armorClass = computed(() => {
-    // Base AC = 10 + DEX mod (unarmored)
-    return 10 + abilityModifiers.value.dex
-  })
+  const armorClass = computed(() => calculateCharacterArmorClass(character.value))
 
   const initiative = computed(() => abilityModifiers.value.dex)
 
@@ -198,12 +233,88 @@ export const useCharacterStore = defineStore('character', () => {
 
   function totalAbilityScore(ability: keyof AbilityScores): number {
     const base = character.value.abilityScores[ability]
-    const bonus = character.value.racialBonuses[ability] || 0
-    return base + bonus
+    const racialBonus = character.value.racialBonuses[ability] || 0
+    const asiBonus = character.value.asiBonuses?.[ability] || 0
+    return base + racialBonus + asiBonus
   }
 
   function resetCharacter() {
     character.value = createEmptyCharacter()
+  }
+
+  function resetBuildAfterLevelChange(newLevel: number) {
+    const current = character.value
+    const level = Math.min(Math.max(Number(newLevel) || 1, 1), getMaxLevel(current.variant))
+    character.value = {
+      ...createEmptyCharacter(),
+      id: current.id,
+      variant: current.variant,
+      name: current.name,
+      playerName: current.playerName,
+      alignment: current.alignment,
+      level,
+      targetLevel: level,
+      baseScoresApplied: false,
+    }
+  }
+
+  function recomputeBuildDerivedState() {
+    const char = character.value
+    char.level = Math.min(Math.max(Number(char.level) || 1, 1), getMaxLevel(char.variant))
+    char.targetLevel = char.level
+
+    const cls = getClasses(char.variant).find(c => c.id === char.className)
+    if (!cls) {
+      char.maxHp = 0
+      char.currentHp = 0
+      char.tempHp = 0
+      char.featuresTraits = []
+      char.asiPoints = 0
+      char.asiBonuses = zeroAbilityScores()
+      char.spellcastingClass = ''
+      char.spellcastingAbility = ''
+      char.cantrips = []
+      char.spellsKnown = []
+      char.spellsPrepared = []
+      return
+    }
+
+    char.hitDie = cls.hitDie
+    char.savingThrowProficiencies = [...cls.savingThrows]
+    const conMod = modifier(totalAbilityScore('con'))
+    char.maxHp = totalHp(char.hitDie, conMod, char.level)
+    char.currentHp = char.maxHp
+    char.hitDie = cls.hitDie
+    if (!char.asiBonuses) char.asiBonuses = zeroAbilityScores()
+    const totalAsiPoints = getAsiCount(cls.id, char.level) * 2
+    const spentAsiPoints = sumAbilityScores(char.asiBonuses)
+    char.asiPoints = Math.max(0, totalAsiPoints - spentAsiPoints)
+
+    const features = cls.features
+      .filter(feature => feature.level <= char.level)
+      .map(feature => feature.name)
+    if (char.subclass) {
+      const subclass = cls.subclasses.find(sub => sub.id === char.subclass)
+      if (subclass) {
+        features.push(
+          ...subclass.features
+            .filter(feature => feature.level <= char.level)
+            .map(feature => feature.name),
+        )
+      }
+    }
+    char.featuresTraits = [...new Set(features)]
+
+    if (cls.spellcasting && !['fighter', 'rogue'].includes(cls.id)) {
+      char.spellcastingClass = cls.id
+      char.spellcastingAbility = cls.spellcasting.ability
+    } else {
+      char.spellcastingClass = ''
+      char.spellcastingAbility = ''
+      char.cantrips = []
+      char.spellsKnown = []
+      char.spellsPrepared = []
+    }
   }
 
   /** Maximum localStorage budget for saved characters (5 MB) */
@@ -240,144 +351,37 @@ export const useCharacterStore = defineStore('character', () => {
     savedCharacters.value = savedCharacters.value.filter(c => c.id !== id)
   }
 
-  /** Whether current character is multiclass */
-  const isMulticlass = computed(() => (character.value.classes ?? []).length >= 2)
-
-  /**
-   * Add a second (or third, etc.) class to the current D&D 5e character.
-   * Only works for dnd5e variant.
-   */
-  function addMulticlass(classId: string) {
-    const char = character.value
-    if (char.variant !== 'dnd5e') return
-
-    const allClasses = getClasses(char.variant)
-    const newCls = allClasses.find(c => c.id === classId)
-    if (!newCls) return
-
-    // If classes array is empty, populate with current primary class first
-    if (char.classes.length === 0) {
-      char.classes.push({
-        classId: char.className,
-        subclass: char.subclass,
-        level: char.level,
-        hitDie: char.hitDie,
-      })
-    }
-
-    // Don't add the same class twice
-    if (char.classes.some(c => c.classId === classId)) return
-
-    // Add the new class at level 1
-    char.classes.push({
-      classId,
-      subclass: '',
-      level: 1,
-      hitDie: newCls.hitDie,
-    })
-
-    // Recalculate total level
-    char.level = char.classes.reduce((sum, c) => sum + c.level, 0)
-
-    // Recalculate HP for the new level 1 in new class
-    const conMod = modifier(
-      char.abilityScores.con + (char.racialBonuses.con || 0),
-    )
-    char.maxHp += hpPerLevel(newCls.hitDie, conMod)
-    char.currentHp = char.maxHp
-  }
-
-  /**
-   * Remove a secondary class from multiclass.
-   * Cannot remove the primary class.
-   */
-  function removeMulticlass(classId: string) {
-    const char = character.value
-    if (char.classes.length < 2) return
-    // Don't remove primary class
-    if (char.classes[0]?.classId === classId) return
-
-    char.classes = char.classes.filter(c => c.classId !== classId)
-
-    // If only one class remains, keep classes populated (it's still valid)
-    // Recalculate total level
-    char.level = char.classes.reduce((sum, c) => sum + c.level, 0)
-
-    // Recalculate total HP from scratch
-    const conMod = modifier(
-      char.abilityScores.con + (char.racialBonuses.con || 0),
-    )
-    let hp = 0
-    for (let i = 0; i < char.classes.length; i++) {
-      const entry = char.classes[i]!
-      for (let lv = 1; lv <= entry.level; lv++) {
-        if (i === 0 && lv === 1) {
-          // First class, first level: max hit die + CON
-          hp += entry.hitDie + conMod
-        } else {
-          hp += hpPerLevel(entry.hitDie, conMod)
-        }
-      }
-    }
-    char.maxHp = Math.max(hp, 1)
-    char.currentHp = char.maxHp
-  }
-
   /**
    * Level up the current character.
-   * For multiclass characters, pass the classId to level up in.
    * Returns { hpGained, newFeatures } or null if at max level.
    */
-  function levelUp(classId?: string): { hpGained: number; newFeatures: string[] } | null {
+  function levelUp(): { hpGained: number; newFeatures: string[] } | null {
     const char = character.value
     const maxLv = getMaxLevel(char.variant)
     if (char.level >= maxLv) return null
 
-    const conMod = modifier(
-      char.abilityScores.con + (char.racialBonuses.con || 0),
-    )
+    const conMod = modifier(totalAbilityScore('con'))
     const allClasses = getClasses(char.variant)
-    let hitDieForLevel: number
-    let targetClassId: string
-    let targetSubclass: string
-
-    if (char.classes.length >= 2 && classId) {
-      // Multiclass: level up specific class
-      const entry = char.classes.find(c => c.classId === classId)
-      if (!entry) return null
-      entry.level += 1
-      char.level = char.classes.reduce((sum, c) => sum + c.level, 0)
-      hitDieForLevel = entry.hitDie
-      targetClassId = entry.classId
-      targetSubclass = entry.subclass
-    } else {
-      // Single class or multiclass without specific target
-      char.level += 1
-      hitDieForLevel = char.hitDie
-      targetClassId = char.className
-      targetSubclass = char.subclass
-
-      // Also update classes array entry if populated
-      if (char.classes.length >= 1) {
-        const entry = char.classes.find(c => c.classId === char.className)
-        if (entry) entry.level += 1
-      }
-    }
+    char.level += 1
+    char.targetLevel = Math.max(char.targetLevel || 1, char.level)
+    char.classes = []
+    const hitDieForLevel = char.hitDie
+    const targetClassId = char.className
+    const targetSubclass = char.subclass
 
     // HP gain: hitDie/2 + 1 + CON modifier
     const hpGained = hpPerLevel(hitDieForLevel, conMod)
     char.maxHp += hpGained
     char.currentHp = char.maxHp
+    if (getAsiCount(char.className, char.level) > getAsiCount(char.className, char.level - 1)) {
+      char.asiPoints = (char.asiPoints || 0) + 2
+    }
 
     // Gather new features from the class/subclass leveled up
     const newFeatures: string[] = []
     const cls = allClasses.find(c => c.id === targetClassId)
     if (cls) {
-      // Use the class-specific level for features
-      const classLevel = char.classes.length >= 2
-        ? (char.classes.find(c => c.classId === targetClassId)?.level ?? char.level)
-        : char.level
-      const classFeats = cls.features.filter(f => f.level === classLevel)
+      const classFeats = cls.features.filter(f => f.level === char.level)
       for (const feat of classFeats) {
         if (!char.featuresTraits.includes(feat.name)) {
           char.featuresTraits.push(feat.name)
@@ -388,7 +392,7 @@ export const useCharacterStore = defineStore('character', () => {
       if (targetSubclass) {
         const sub = cls.subclasses.find(s => s.id === targetSubclass)
         if (sub) {
-          const subFeats = sub.features.filter(f => f.level === classLevel)
+          const subFeats = sub.features.filter(f => f.level === char.level)
           for (const feat of subFeats) {
             if (!char.featuresTraits.includes(feat.name)) {
               char.featuresTraits.push(feat.name)
@@ -408,7 +412,52 @@ export const useCharacterStore = defineStore('character', () => {
     return { hpGained, newFeatures }
   }
 
+  function levelUpToTarget(): { levelsGained: number; hpGained: number; newFeatures: string[] } {
+    const target = Math.min(Math.max(character.value.targetLevel || 1, 1), getMaxLevel(character.value.variant))
+    let levelsGained = 0
+    let hpGained = 0
+    const newFeatures: string[] = []
+    while (character.value.level < target) {
+      const result = levelUp()
+      if (!result) break
+      levelsGained += 1
+      hpGained += result.hpGained
+      newFeatures.push(...result.newFeatures)
+    }
+    return { levelsGained, hpGained, newFeatures }
+  }
+
+  function spendAsiPoint(ability: keyof AbilityScores) {
+    if ((character.value.asiPoints || 0) <= 0) return
+    const total = totalAbilityScore(ability)
+    if (total >= 20) return
+    character.value.asiPoints = character.value.asiPoints || 0
+    if (!character.value.asiBonuses) character.value.asiBonuses = zeroAbilityScores()
+    character.value.asiBonuses[ability] += 1
+    character.value.asiPoints -= 1
+    recomputeBuildDerivedState()
+  }
+
+  function refundAsiPoint(ability: keyof AbilityScores) {
+    if (!character.value.asiBonuses) character.value.asiBonuses = zeroAbilityScores()
+    if (character.value.asiBonuses[ability] <= 0) return
+    character.value.asiPoints = character.value.asiPoints || 0
+    character.value.asiBonuses[ability] -= 1
+    character.value.asiPoints += 1
+    recomputeBuildDerivedState()
+  }
+
+  function resetEquipmentBudgetForClass() {
+    character.value.equipmentBudgetGp = averageStartingGold(character.value.className)
+    character.value.equipmentSpentGp = 0
+    character.value.coins = { cp: 0, sp: 0, ep: 0, gp: character.value.equipmentBudgetGp, pp: 0 }
+  }
+
   function exportJson(): string {
+    const validationErrors = validateCharacterForExport(character.value)
+    if (validationErrors.length > 0) {
+      throw new Error('EXPORT_VALIDATION:' + validationErrors.join('\n'))
+    }
     const {
       bonds,
       backstory,
@@ -430,6 +479,9 @@ export const useCharacterStore = defineStore('character', () => {
       virtue,
       sin,
       humanity,
+      classes,
+      targetLevel,
+      baseScoresApplied,
       ...exportable
     } = character.value
     void bonds
@@ -452,6 +504,9 @@ export const useCharacterStore = defineStore('character', () => {
     void virtue
     void sin
     void humanity
+    void classes
+    void targetLevel
+    void baseScoresApplied
     return JSON.stringify(exportable, null, 2)
   }
 
@@ -510,11 +565,22 @@ export const useCharacterStore = defineStore('character', () => {
     // Validate arrays that should be arrays
     const arrayFields: (keyof CharacterData)[] = [
       'skillProficiencies', 'languages', 'equipment', 'featuresTraits',
-      'cantrips', 'spellsKnown', 'spellsPrepared', 'weapons', 'classes',
+      'cantrips', 'spellsKnown', 'spellsPrepared', 'weapons', 'classes', 'purchasedEquipment',
     ]
     for (const field of arrayFields) {
       if (raw[field] !== undefined && !Array.isArray(raw[field])) {
         errors.push(`INVALID_${field.toUpperCase()}`)
+      }
+    }
+
+    if (Array.isArray(raw.classes)) {
+      const validClasses = raw.classes.filter(c =>
+        typeof c === 'object' && c !== null &&
+        typeof (c as Record<string, unknown>).classId === 'string' &&
+        typeof (c as Record<string, unknown>).level === 'number'
+      )
+      if (validClasses.length >= 2) {
+        errors.push('UNSUPPORTED_MULTICLASS')
       }
     }
 
@@ -535,7 +601,7 @@ export const useCharacterStore = defineStore('character', () => {
     const stringArrayFields = [
       'skillProficiencies', 'skillExpertise', 'savingThrowProficiencies',
       'languages', 'proficienciesOther', 'equipment', 'featuresTraits',
-      'cantrips', 'spellsKnown', 'spellsPrepared', 'brawlingMoves',
+      'cantrips', 'spellsKnown', 'spellsPrepared', 'brawlingMoves', 'purchasedEquipment',
     ] as const
     for (const field of stringArrayFields) {
       if (Array.isArray(safeRaw[field])) {
@@ -554,14 +620,7 @@ export const useCharacterStore = defineStore('character', () => {
       )
     }
 
-    // Validate classes array contents
-    if (Array.isArray(safeRaw.classes)) {
-      safeRaw.classes = (safeRaw.classes as unknown[]).filter((c): c is ClassEntry =>
-        typeof c === 'object' && c !== null &&
-        typeof (c as Record<string, unknown>).classId === 'string' &&
-        typeof (c as Record<string, unknown>).level === 'number'
-      )
-    }
+    safeRaw.classes = []
 
     // Truncate long strings to prevent abuse
     for (const [key, value] of Object.entries(safeRaw)) {
@@ -586,6 +645,15 @@ export const useCharacterStore = defineStore('character', () => {
       allies: '',
       treasure: '',
       sessionNotes: '',
+      classes: [],
+      targetLevel: (typeof raw.targetLevel === 'number' && raw.targetLevel >= 1 && raw.targetLevel <= 20)
+        ? raw.targetLevel
+        : (typeof raw.level === 'number' ? raw.level : 1),
+      asiPoints: typeof raw.asiPoints === 'number' ? raw.asiPoints : 0,
+      baseScoresApplied: typeof raw.baseScoresApplied === 'boolean' ? raw.baseScoresApplied : true,
+      asiBonuses: normalizeAbilityScores(raw.asiBonuses, 0),
+      equipmentBudgetGp: typeof raw.equipmentBudgetGp === 'number' ? raw.equipmentBudgetGp : 0,
+      equipmentSpentGp: typeof raw.equipmentSpentGp === 'number' ? raw.equipmentSpentGp : 0,
     }
 
     // Add warnings for optional missing fields
@@ -607,13 +675,16 @@ export const useCharacterStore = defineStore('character', () => {
     passivePerception,
     totalAbilityScore,
     resetCharacter,
+    resetBuildAfterLevelChange,
+    recomputeBuildDerivedState,
     saveCharacter,
     loadCharacter,
     deleteCharacter,
-    isMulticlass,
-    addMulticlass,
-    removeMulticlass,
     levelUp,
+    levelUpToTarget,
+    spendAsiPoint,
+    refundAsiPoint,
+    resetEquipmentBudgetForClass,
     exportJson,
     importJson,
   }

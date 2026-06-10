@@ -42,6 +42,7 @@
     "INVALID_SPELLSKNOWN": "Gli incantesimi conosciuti devono essere una lista",
     "INVALID_SPELLSPREPARED": "Gli incantesimi preparati devono essere una lista",
     "INVALID_WEAPONS": "Le armi devono essere una lista",
+    "UNSUPPORTED_MULTICLASS": "I personaggi multiclasse non sono supportati dall'esportazione Project Infinity",
     "WARN_NO_NAME": "Il personaggio non ha un nome",
     "WARN_NO_BACKGROUND": "Il personaggio non ha un background",
     "WARN_NO_HP": "I punti ferita non sono stati calcolati"
@@ -102,9 +103,24 @@
     "pointBuy": "Acquisto Punti",
     "roll": "Tira i Dadi",
     "pointsRemaining": "Punti rimanenti: {points}",
-    "rollDice": "Tira 4d6",
     "reroll": "Ritira Tutti",
     "assign": "Assegna alle Caratteristiche",
+    "stage": "Fase",
+    "baseStageTitle": "Punteggi Base",
+    "baseStageHint": "Scegli e applica i punteggi iniziali prima di spendere i bonus di livello.",
+    "levelBonusStageTitle": "Bonus di Livello",
+    "levelBonusStageHint": "Spendi i punti ASI derivati dal livello dopo aver bloccato i punteggi base.",
+    "applyBaseScores": "Applica Punteggi Base",
+    "editBaseScores": "Modifica Punteggi Base",
+    "baseScoresApplied": "Punteggi base applicati",
+    "incompleteBaseScores": "Assegna tutti e sei i punteggi base prima di continuare.",
+    "noAsiHint": "Questo livello non concede punti Aumento dei Punteggi di Caratteristica.",
+    "current": "attuale",
+    "asiTitle": "Aumento dei Punteggi di Caratteristica",
+    "asiHint": "Spendi questi punti ASI derivati dal livello dopo aver scelto i punteggi base. I talenti non sono supportati in questa versione.",
+    "asiRemaining": "ASI rimanenti: {points}",
+    "base": "Base",
+    "asiBonus": "Bonus ASI",
     "modifier": "Modificatore",
     "racialBonus": "Bonus Razziale",
     "total": "Totale",
@@ -136,7 +152,13 @@
     "tools": "Strumenti",
     "coins": "Monete",
     "other": "Altro Equipaggiamento",
-    "addItem": "Aggiungi oggetto..."
+    "addItem": "Aggiungi oggetto...",
+    "budget": "Budget",
+    "spent": "Speso",
+    "remaining": "Rimanente",
+    "strictPurchaseHint": "La ricchezza iniziale della classe e l'oro del background definiscono il budget. L'equipaggiamento del background e' gratuito; gli acquisti non possono superare il budget.",
+    "backgroundGrant": "Equipaggiamento del Background",
+    "packs": "Pacchetti"
   },
   "spells": {
     "title": "Incantesimi",
@@ -159,7 +181,9 @@
     "notACasterMulticlass": "Nessuna delle tue classi ha capacita' di incantesimi.",
     "pressNext": "Premi Avanti per continuare.",
     "pactMagic": "Magia del Patto",
-    "allLevels": "Tutti i livelli"
+    "allLevels": "Tutti i livelli",
+    "maxSpellLevel": "Livello massimo incantesimi",
+    "spellbook": "Libro degli Incantesimi"
   },
   "details": {
     "title": "Dettagli del Personaggio",
@@ -191,7 +215,8 @@
     "selectVirtue": "Scegli la Virtu'",
     "selectSin": "Scegli il Peccato",
     "sessionNotes": "Note di Sessione",
-    "sessionNotesPlaceholder": "Appunta note dalle sessioni, promemoria, obiettivi..."
+    "sessionNotesPlaceholder": "Appunta note dalle sessioni, promemoria, obiettivi...",
+    "levelHint": "Scegli ora il livello iniziale finale del personaggio. Cambiarlo piu' tardi cancellera' razza, classe, equipaggiamento, incantesimi e le scelte successive."
   },
   "review": {
     "title": "Riepilogo del Personaggio",
@@ -217,6 +242,12 @@
     "charRace": "Razza",
     "charBackground": "Background",
     "armorLabel": "Armatura",
+    "levelPlanning": "Pianificazione Livello",
+    "targetLevel": "Livello Obiettivo",
+    "levelToTarget": "Sali al Livello Obiettivo",
+    "levelPlanningHint": "Crea prima il personaggio base, poi sali di livello qui. Completa sottoclasse, ASI e incantesimi prima dell'esportazione.",
+    "asiRemaining": "Punti ASI rimanenti: {count}",
+    "exportBlocked": "L'esportazione Project Infinity e' bloccata",
     "shieldBonus": "+ Scudo (+2 CA)",
     "noArmor": "Nessuna",
     "saveSuccess": "Personaggio salvato con successo nel browser!",
@@ -261,8 +292,10 @@
     "stepProgress": "Passo {current} di {total}"
   },
   "validation": {
+    "validLevel": "Scegli un livello da 1 a 20 prima di continuare",
     "selectRace": "Seleziona una razza prima di continuare",
     "selectClass": "Seleziona una classe prima di continuare",
+    "spendAsi": "Applica i punteggi base, spendi tutti i punti ASI e mantieni ogni punteggio finale a 20 o meno prima di continuare",
     "selectBackground": "Seleziona un background prima di continuare",
     "completeStep": "Completa questo passo prima di continuare"
   },

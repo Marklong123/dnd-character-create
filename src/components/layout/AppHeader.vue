@@ -28,7 +28,7 @@ function closeMobile() {
         @click="mobileOpen = !mobileOpen"
         :aria-expanded="mobileOpen"
         aria-controls="main-nav"
-        :aria-label="mobileOpen ? 'Close menu' : 'Open menu'"
+        :aria-label="mobileOpen ? t('a11y.closeMenu') : t('a11y.openMenu')"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path v-if="!mobileOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />

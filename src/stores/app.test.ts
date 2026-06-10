@@ -52,8 +52,8 @@ describe('useAppStore', () => {
     const store = useAppStore()
     store.setLocale('en')
     expect(store.locale).toBe('en')
-    store.setLocale('it')
-    expect(store.locale).toBe('it')
+    store.setLocale('zh')
+    expect(store.locale).toBe('zh')
   })
 
   it('sets theme', () => {
