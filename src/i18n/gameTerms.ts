@@ -1707,14 +1707,24 @@ export const raceNamesZh: Record<string, string> = {
 
 export const subraceNamesZh: Record<string, string> = {
   'Hill Dwarf': '丘陵矮人',
+  'hill-dwarf': '丘陵矮人',
   'Mountain Dwarf': '山地矮人',
+  'mountain-dwarf': '山地矮人',
   'High Elf': '高等精灵',
+  'high-elf': '高等精灵',
   'Wood Elf': '木精灵',
+  'wood-elf': '木精灵',
   'Dark Elf (Drow)': '黑暗精灵（卓尔）',
+  'dark-elf': '黑暗精灵（卓尔）',
+  'drow': '卓尔',
   'Rock Gnome': '岩侏儒',
+  'rock-gnome': '岩侏儒',
   'Forest Gnome': '森侏儒',
+  'forest-gnome': '森侏儒',
   'Lightfoot Halfling': '轻足半身人',
+  'lightfoot': '轻足半身人',
   'Stout Halfling': '健壮半身人',
+  'stout': '健壮半身人',
 }
 
 export const skillNamesZh: Record<string, string> = {
@@ -1790,6 +1800,7 @@ export const proficiencyNamesZh: Record<string, string> = {
   'martial': '军用武器',
   'martial weapons': '军用武器',
   'all': '全部',
+  'all armor': '全部护甲',
   'hand crossbow': '手弩',
   'longsword': '长剑',
   'rapier': '刺剑',
@@ -1804,10 +1815,14 @@ export const proficiencyNamesZh: Record<string, string> = {
   'gaming set': '赌具',
   'herbalism kit': '草药师工具',
   'land vehicles': '陆地载具',
+  'drum': '鼓',
+  'flute': '长笛',
+  'lute': '鲁特琴',
   'musical instrument': '乐器',
   'musical instruments': '乐器',
   'navigator tools': '领航员工具',
   "navigator's tools": '领航员工具',
+  "tinker's tools": '修补匠工具',
   'water vehicles': '水上载具',
   "artisan's tools or musical instrument": '工匠工具或乐器',
   'artisans tools or musical instrument': '工匠工具或乐器',
@@ -1989,6 +2004,7 @@ export const languageNamesZh: Record<string, string> = {
   'Celestial': '天界语',
   'Draconic': '龙语',
   'Deep Speech': '地底语',
+  'Druidic': '德鲁伊语',
   'Infernal': '炼狱语',
   'Primordial': '原初语',
   'Sylvan': '木族语',
@@ -2132,7 +2148,31 @@ Object.assign(featureNamesZh, {
   'Open Hand Technique': '散打技法',
   'Channel Divinity: Sacred Weapon': '引导神力：神圣武器',
   'Channel Divinity: Turn the Unholy': '引导神力：驱散邪秽',
+  'Divine Domain: Life': '神圣领域：生命领域',
+  'Divine Domain: Life Domain': '神圣领域：生命领域',
+  'Sorcerous Origin: Draconic Bloodline': '术法起源：龙族血脉',
+  'Sorcerous Origin: Wild Magic': '术法起源：狂野魔法',
+  'Otherworldly Patron: The Fiend': '异界宗主：邪魔宗主',
+  'Otherworldly Patron: The Archfey': '异界宗主：大妖精',
+  'Otherworldly Patron: The Great Old One': '异界宗主：旧日支配者',
+  'Arcane Tradition: School of Evocation': '奥术传统：塑能学派',
+  'Bard College: College of Lore': '吟游学院：逸闻学院',
+  'Druid Circle: Circle of the Land': '德鲁伊结社：大地结社',
+  'Fighting Style: Archery': '战斗风格：箭术',
+  'Fighting Style: Defense': '战斗风格：防御',
+  'Fighting Style: Dueling': '战斗风格：决斗',
+  'Fighting Style: Great Weapon Fighting': '战斗风格：巨武器战斗',
+  'Fighting Style: Protection': '战斗风格：保护',
+  'Fighting Style: Two-Weapon Fighting': '战斗风格：双武器战斗',
+  'Martial Archetype: Champion': '武术范型：勇士',
+  'Monastic Tradition: Way of the Open Hand': '武僧传统：散打宗',
+  'Primal Path: Path of the Berserker': '原初道途：狂战士道途',
+  'Ranger Archetype: Hunter': '游侠范型：猎人',
+  'Roguish Archetype: Thief': '游荡者范型：盗贼',
+  'Sacred Oath: Oath of Devotion': '神圣誓言：奉献誓言',
   "Hunter's Prey": '猎人猎物',
+  "Hunter's Prey: Colossus Slayer": '猎人猎物：巨像杀手',
+  "Hunter's Prey: Horde Breaker": '猎人猎物：破群者',
   'Fast Hands': '快手',
   'Second-Story Work': '二楼作业',
   'Dragon Ancestor': '龙族先祖',
@@ -2177,6 +2217,10 @@ Object.assign(proficiencyNamesZh, {
   'Fishing tackle': '钓具',
   'Brewer\'s supplies': '酿酒工具',
   'Cook\'s utensils': '厨具',
+  "Smith's tools": '铁匠工具',
+  'smiths tools': '铁匠工具',
+  "smith's tools": '铁匠工具',
+  'lute': '鲁特琴',
   'club': '棍棒',
   'dagger': '匕首',
   'dart': '飞镖',
@@ -2191,7 +2235,45 @@ Object.assign(proficiencyNamesZh, {
 })
 
 Object.assign(equipmentNamesZh, {
+  '10 Darts': '10 支飞镖',
+  '2 Shortswords': '2 把短剑',
+  '2 Daggers': '2 把匕首',
+  '2 Handaxes': '2 把手斧',
+  '4 Javelins': '4 支标枪',
+  '5 Javelins': '5 支标枪',
+  '20 Arrows': '20 支箭矢',
+  '20 arrows': '20 支箭矢',
+  '20 Bolts': '20 支弩矢',
+  '20 bolts': '20 支弩矢',
+  'Arcane focus (crystal orb)': '奥术法器（水晶球）',
+  'Bottle of ink': '墨水瓶',
   'Bottle of black ink': '黑墨水瓶',
+  'Component pouch': '材料包',
+  'Crowbar': '撬棍',
+  'Dark common clothes with hood': '带兜帽的深色普通服装',
+  'Druidic Focus': '德鲁伊法器',
+  'Druidic focus (mistletoe)': '德鲁伊法器（槲寄生）',
+  'Druidic focus (yew wand)': '德鲁伊法器（紫杉木魔杖）',
+  'Hunting trap': '捕兽夹',
+  'Incense': '熏香',
+  'Iron pot': '铁锅',
+  'Leather Armor': '皮甲',
+  'Letter of recommendation': '推荐信',
+  'Map of the city': '城市地图',
+  'Pet mouse': '宠物鼠',
+  'Quill': '羽毛笔',
+  'Quiver of 20 arrows': '装有 20 支箭矢的箭袋',
+  'Rank insignia': '军阶徽记',
+  'Rope (50 ft)': '50 尺绳索',
+  'Scroll case of notes': '装着笔记的卷轴筒',
+  'Small knife': '小刀',
+  'Staff': '法杖',
+  'Studded Leather Armor': '镶钉皮甲',
+  'Token from parents': '父母留下的信物',
+  'Tools of the con': '骗术工具',
+  "Tinker's tools": '修补匠工具',
+  'Trophy from a dire wolf': '恐狼战利品',
+  'Trophy from a fallen foe': '倒下敌人的战利品',
   'Prayer book or prayer wheel': '祈祷书或转经轮',
   '5 sticks of incense': '5 支熏香',
   'Tools of the con (ten stoppered bottles filled with colored liquid, a weighted die set, a deck of marked cards, or a signet ring of an imaginary duke)': '骗术工具（十个装有有色液体的塞瓶、一副加重骰、一副做记号的牌，或一枚虚构公爵的印戒）',
@@ -2215,6 +2297,7 @@ Object.assign(equipmentNamesZh, {
   'Tent': '帐篷',
   "Navigator's tools": '领航员工具',
   '50 feet of rope': '50 尺绳索',
+  'Wooden Shield': '木盾',
   'Abacus': '算盘',
   "Merchant's scale": '商人天平',
   'Forgery kit': '文书伪造工具',
@@ -2483,8 +2566,56 @@ function normalizeId(name: string): string {
   return name.trim().toLowerCase().replace(/['’]/g, '').replace(/-/g, ' ')
 }
 
+function kebabize(name: string): string {
+  return normalizeId(name).replace(/\s+/g, '-')
+}
+
 function titleize(name: string): string {
   return name.split(/[-\s]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+}
+
+function compactKey(name: string): string {
+  return normalizeId(name).replace(/\s+/g, '')
+}
+
+function termCandidates(name: string): string[] {
+  const trimmed = name.trim()
+  const normalized = normalizeId(trimmed)
+  const kebab = kebabize(trimmed)
+  const title = titleize(trimmed)
+  const normalizedTitle = titleize(normalized)
+  const deApostrophe = trimmed.replace(/['’]/g, '')
+  const lower = trimmed.toLowerCase()
+  const lowerKebab = lower.replace(/\s+/g, '-')
+  return [
+    trimmed,
+    title,
+    normalizedTitle,
+    normalized,
+    kebab,
+    lower,
+    lowerKebab,
+    deApostrophe,
+    titleize(deApostrophe),
+  ].filter((value, index, values) => value && values.indexOf(value) === index)
+}
+
+function lookupTerm(table: Record<string, string>, name: string): string | undefined {
+  for (const candidate of termCandidates(name)) {
+    const translated = table[candidate]
+    if (translated) return translated
+  }
+
+  const wanted = compactKey(name)
+  return Object.entries(table).find(([key]) => compactKey(key) === wanted)?.[1]
+}
+
+function lookupAnyTerm(name: string, tables: Array<Record<string, string>>): string | undefined {
+  for (const table of tables) {
+    const translated = lookupTerm(table, name)
+    if (translated) return translated
+  }
+  return undefined
 }
 
 export function translateGameDescription(
@@ -2529,62 +2660,45 @@ export function translateGameTerm(
   if (locale.startsWith('zh')) {
     switch (category) {
       case 'weapon':
-        return weaponNamesZh[name] ?? weaponNamesZh[titleize(name)] ?? name
+        return lookupTerm(weaponNamesZh, name) ?? name
       case 'armor':
-        return armorNamesZh[name] ?? armorNamesZh[titleize(name)] ?? name
+        return lookupTerm(armorNamesZh, name) ?? name
       case 'spell':
-        return spellNamesZh[name] ?? name
+        return lookupTerm(spellNamesZh, name) ?? name
       case 'school':
-        return spellSchoolsZh[name] ?? name
+        return lookupTerm(spellSchoolsZh, name) ?? name
       case 'damageType':
-        return damageTypesZh[name] ?? name
+        return lookupTerm(damageTypesZh, name) ?? name
       case 'pack':
-        return equipmentPacksZh[name] ?? equipmentPacksZh[titleize(name)] ?? name
-      case 'background': {
-        const bgCapitalized = titleize(name)
-        return backgroundNamesZh[name] ?? backgroundNamesZh[bgCapitalized] ?? name
-      }
-      case 'class': {
-        const capitalized = titleize(name)
-        return classNamesZh[capitalized] ?? classNamesZh[name] ?? name
-      }
-      case 'race': {
-        const raceCapitalized = name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-')
-        return raceNamesZh[name] ?? raceNamesZh[raceCapitalized] ?? raceNamesZh[raceCapitalized.replace(/-/g, ' ')] ?? name
-      }
-      case 'subrace': {
-        const subCapitalized = titleize(name)
-        return subraceNamesZh[name] ?? subraceNamesZh[subCapitalized] ?? subclassNamesZh[name] ?? name
-      }
-      case 'skill': {
-        const skillCapitalized = titleize(name)
-        return skillNamesZh[name] ?? skillNamesZh[skillCapitalized] ?? name
-      }
-      case 'proficiency': {
-        const key = normalizeId(name)
-        const profCapitalized = titleize(name)
-        return proficiencyNamesZh[name] ?? proficiencyNamesZh[key] ?? proficiencyNamesZh[profCapitalized] ?? weaponNamesZh[profCapitalized] ?? armorNamesZh[profCapitalized] ?? name
-      }
+        return lookupTerm(equipmentPacksZh, name) ?? name
+      case 'background':
+        return lookupTerm(backgroundNamesZh, name) ?? name
+      case 'class':
+        return lookupTerm(classNamesZh, name) ?? name
+      case 'race':
+        return lookupTerm(raceNamesZh, name) ?? name
+      case 'subrace':
+        return lookupAnyTerm(name, [subraceNamesZh, subclassNamesZh]) ?? name
+      case 'skill':
+        return lookupTerm(skillNamesZh, name) ?? name
+      case 'proficiency':
+        return lookupAnyTerm(name, [proficiencyNamesZh, weaponNamesZh, armorNamesZh, equipmentNamesZh]) ?? name
       case 'feature':
-        return featureNamesZh[name] ?? traitNamesZh[name] ?? name
+        return lookupAnyTerm(name, [featureNamesZh, traitNamesZh, subclassNamesZh]) ?? name
       case 'trait':
-        return traitNamesZh[name] ?? featureNamesZh[name] ?? name
+        return lookupAnyTerm(name, [traitNamesZh, featureNamesZh, subclassNamesZh]) ?? name
       case 'language':
-        return languageNamesZh[name] ?? name
+        return lookupTerm(languageNamesZh, name) ?? name
       case 'subclass':
-        return subclassNamesZh[name] ?? subclassNamesZh[normalizeId(name)] ?? name
-      case 'equipment': {
-        const eqCapitalized = titleize(name)
-        return equipmentNamesZh[name] ?? equipmentNamesZh[eqCapitalized] ?? proficiencyNamesZh[normalizeId(name)] ?? weaponNamesZh[eqCapitalized] ?? armorNamesZh[eqCapitalized] ?? equipmentPacksZh[eqCapitalized] ?? name
-      }
+        return lookupTerm(subclassNamesZh, name) ?? name
+      case 'equipment':
+        return lookupAnyTerm(name, [equipmentNamesZh, proficiencyNamesZh, weaponNamesZh, armorNamesZh, equipmentPacksZh]) ?? name
       case 'ability':
         return abilityNamesZh[name.toLowerCase()] ?? name.toUpperCase()
       case 'casterType':
-        return casterTypeNamesZh[name] ?? name
-      case 'size': {
-        const sizeCapitalized = titleize(name)
-        return sizeNamesZh[name] ?? sizeNamesZh[sizeCapitalized] ?? name
-      }
+        return lookupTerm(casterTypeNamesZh, name) ?? name
+      case 'size':
+        return lookupTerm(sizeNamesZh, name) ?? name
       default:
         return name
     }

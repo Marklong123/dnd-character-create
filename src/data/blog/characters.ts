@@ -1,5 +1,7 @@
 import type { GameVariant } from '@/stores/app'
 import type { CharacterData } from '@/stores/character'
+import { applyDnd5eBlogLocalization } from './dnd5e/localized'
+import { dnd5eLevelOneCharacters } from './dnd5e/level-one'
 
 // ─── Blog Character Interface ───────────────────────────────────────────────
 
@@ -89,8 +91,14 @@ import { cronistaOblio } from './apocalisse/cronista-oblio'
 
 // ─── Character Registry ─────────────────────────────────────────────────────
 
-export const blogCharacters: BlogCharacter[] = [
-  // ── D&D 5e (23 characters) ─────────────────────────────────────────────
+const rawBlogCharacters: BlogCharacter[] = [
+  // ── D&D 5e (35 characters) ─────────────────────────────────────────────
+  ...dnd5eLevelOneCharacters.map(template => ({
+    slug: template.slug,
+    variant: 'dnd5e' as const,
+    characterData: template.characterData,
+    tags: template.tags,
+  })),
   {
     slug: 'ranger-elf-elara-nightwhisper',
     variant: 'dnd5e',
@@ -480,6 +488,15 @@ export const blogCharacters: BlogCharacter[] = [
     tags: ['risen-limbo', 'wizard', 'solomon', 'apocalisse'],
   },
 ]
+
+export const blogCharacters: BlogCharacter[] = rawBlogCharacters.map(character => (
+  character.variant === 'dnd5e'
+    ? {
+        ...character,
+        characterData: applyDnd5eBlogLocalization(character.slug, character.characterData),
+      }
+    : character
+))
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 

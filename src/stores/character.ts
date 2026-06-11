@@ -4,7 +4,7 @@ import type { GameVariant } from './app'
 import { modifier, proficiencyBonus, hpPerLevel, totalHp } from '@/utils/calculations'
 import { getMaxLevel, getClasses } from '@/data'
 import { averageStartingGold } from '@/data/dnd5e/equipmentPrices'
-import { validateCharacterForExport } from '@/utils/characterValidation'
+import { exportCharacterJson } from '@/utils/characterExport'
 import { getAsiCount, sumAbilityScores, zeroAbilityScores } from '@/utils/dndRules'
 import { calculateCharacterArmorClass } from '@/utils/armorClass'
 
@@ -454,60 +454,7 @@ export const useCharacterStore = defineStore('character', () => {
   }
 
   function exportJson(): string {
-    const validationErrors = validateCharacterForExport(character.value)
-    if (validationErrors.length > 0) {
-      throw new Error('EXPORT_VALIDATION:' + validationErrors.join('\n'))
-    }
-    const {
-      bonds,
-      backstory,
-      age,
-      height,
-      weight,
-      eyes,
-      hair,
-      skin,
-      allies,
-      treasure,
-      sessionNotes,
-      brawlingMoves,
-      misdeeds,
-      size,
-      whacksLevel,
-      mark,
-      markSpirit,
-      virtue,
-      sin,
-      humanity,
-      classes,
-      targetLevel,
-      baseScoresApplied,
-      ...exportable
-    } = character.value
-    void bonds
-    void backstory
-    void age
-    void height
-    void weight
-    void eyes
-    void hair
-    void skin
-    void allies
-    void treasure
-    void sessionNotes
-    void brawlingMoves
-    void misdeeds
-    void size
-    void whacksLevel
-    void mark
-    void markSpirit
-    void virtue
-    void sin
-    void humanity
-    void classes
-    void targetLevel
-    void baseScoresApplied
-    return JSON.stringify(exportable, null, 2)
+    return exportCharacterJson(character.value)
   }
 
   /**

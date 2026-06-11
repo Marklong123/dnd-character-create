@@ -3,12 +3,15 @@ import { computed, ref, watchEffect, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getBlogCharacterBySlug } from '@/data/blog/characters'
+import { preloadVariantData } from '@/data'
 import { useCharacterStore } from '@/stores/character'
 import { useGameTerms } from '@/composables/useGameTerms'
 import { usePdfExport } from '@/composables/usePdfExport'
 import { generateShareUrl } from '@/utils/shareCharacter'
 import { modifier, proficiencyBonus } from '@/utils/calculations'
 import { calculateCharacterArmorClass } from '@/utils/armorClass'
+import { exportCharacterJson } from '@/utils/characterExport'
+import { spells as dnd5eSpells } from '@/data/dnd5e/spells'
 import type { CharacterData } from '@/stores/character'
 
 const route = useRoute()
@@ -58,16 +61,22 @@ async function downloadPdf() {
   await exportPdfFor(char.value)
 }
 
-function downloadJson() {
+async function downloadJson() {
   if (!char.value) return
-  const json = JSON.stringify(char.value, null, 2)
-  const blob = new Blob([json], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${char.value.name || 'character'}.json`
-  a.click()
-  URL.revokeObjectURL(url)
+  try {
+    await preloadVariantData(char.value.variant)
+    const json = exportCharacterJson(char.value)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${char.value.name || 'character'}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (err) {
+    const message = (err as Error).message
+    alert(message.startsWith('EXPORT_VALIDATION:') ? message.replace('EXPORT_VALIDATION:', '') : message)
+  }
 }
 
 function saveToProfile() {
@@ -108,6 +117,11 @@ function charField(field: string): string {
     return (char.value as unknown as Record<string, unknown>)[field] as string ?? ''
   }
   return translated
+}
+
+function spellDisplayName(idOrName: string): string {
+  const spell = dnd5eSpells.find(spell => spell.id === idOrName || spell.name === idOrName)
+  return gt.spell(spell?.name ?? idOrName)
 }
 
 // ─── SEO ────────────────────────────────────────────────────────────────────
@@ -411,7 +425,7 @@ onUnmounted(() => {
     </section>
 
     <!-- ─── Spells ──────────────────────────────────────────────────── -->
-    <section v-if="char.spellsKnown.length > 0 || char.cantrips.length > 0" class="bg-stone-800 rounded-xl border border-stone-700 p-6">
+    <section v-if="char.spellsKnown.length > 0 || char.spellsPrepared.length > 0 || char.cantrips.length > 0" class="bg-stone-800 rounded-xl border border-stone-700 p-6">
       <h2 class="text-xl font-bold text-amber-400 mb-3 font-gothic">
         <span aria-hidden="true">🔮</span> {{ t('blog.spellsTitle') }}
       </h2>
@@ -426,7 +440,7 @@ onUnmounted(() => {
             :key="c"
             class="bg-purple-900/30 text-purple-300 border border-purple-700/30 px-3 py-1 rounded-lg text-sm"
           >
-            {{ gt.spell(c) }}
+            {{ spellDisplayName(c) }}
           </span>
         </div>
       </div>
@@ -438,7 +452,19 @@ onUnmounted(() => {
             :key="s"
             class="bg-purple-900/30 text-purple-300 border border-purple-700/30 px-3 py-1 rounded-lg text-sm"
           >
-            {{ gt.spell(s) }}
+            {{ spellDisplayName(s) }}
+          </span>
+        </div>
+      </div>
+      <div v-if="char.spellsPrepared.length > 0" class="mt-3">
+        <h3 class="text-sm text-stone-500 mb-1">{{ t('spells.preparedSpells') }}</h3>
+        <div class="flex flex-wrap gap-2">
+          <span
+            v-for="s in char.spellsPrepared"
+            :key="s"
+            class="bg-purple-900/30 text-purple-300 border border-purple-700/30 px-3 py-1 rounded-lg text-sm"
+          >
+            {{ spellDisplayName(s) }}
           </span>
         </div>
       </div>
@@ -453,11 +479,11 @@ onUnmounted(() => {
         </div>
         <div v-if="char.height" class="bg-stone-900/50 rounded-lg p-2">
           <span class="text-stone-500 block text-xs">{{ t('details.height') }}</span>
-          <span class="text-stone-200">{{ char.height }}</span>
+          <span class="text-stone-200">{{ charField('height') }}</span>
         </div>
         <div v-if="char.weight" class="bg-stone-900/50 rounded-lg p-2">
           <span class="text-stone-500 block text-xs">{{ t('details.weight') }}</span>
-          <span class="text-stone-200">{{ char.weight }}</span>
+          <span class="text-stone-200">{{ charField('weight') }}</span>
         </div>
         <div v-if="char.eyes" class="bg-stone-900/50 rounded-lg p-2">
           <span class="text-stone-500 block text-xs">{{ t('details.eyes') }}</span>

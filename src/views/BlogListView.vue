@@ -71,7 +71,7 @@ onUnmounted(() => {
 
         <p class="text-sm text-stone-300">
           {{ gt.className(char.characterData.className, char.variant) }}
-          <span class="text-stone-500">Lv.{{ char.characterData.level }}</span>
+          <span class="text-stone-500">{{ t('blog.levelLabel', { level: char.characterData.level }) }}</span>
         </p>
 
         <p class="text-xs text-stone-500 mt-auto line-clamp-2">

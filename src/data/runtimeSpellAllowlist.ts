@@ -1,3 +1,5 @@
+import runtimeSpellsYamlRaw from './dnd5e/spells.yml?raw'
+
 export const RUNTIME_SUPPORTED_SPELL_NAMES = [
   'Acid Splash',
   'Blade Ward',
@@ -230,7 +232,7 @@ export function parseRuntimeSpellNames(raw?: string): Set<string> {
   return names
 }
 
-export const runtimeSpellNames = parseRuntimeSpellNames()
+export const runtimeSpellNames = parseRuntimeSpellNames(runtimeSpellsYamlRaw)
 
 export function isRuntimeSpellSupported(name: unknown): boolean {
   return runtimeSpellNames.has(normalizeSpellName(name))

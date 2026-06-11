@@ -49,6 +49,26 @@ describe('game term display translations', () => {
     expect(translateRulesText('1 action', 'zh')).toBe('1 个动作')
   })
 
+  it('normalizes template panel terms for the Chinese display locale', () => {
+    expect(translateGameTerm('sleight of hand', 'zh', 'skill')).toBe('巧手')
+    expect(translateGameTerm('animal handling', 'zh', 'skill')).toBe('驯兽')
+    expect(translateGameTerm('Darkvision', 'zh', 'feature')).toBe('黑暗视觉')
+    expect(translateGameTerm('Hellish Resistance', 'zh', 'feature')).toBe('炼狱抗性')
+    expect(translateGameTerm('Infernal Legacy', 'zh', 'feature')).toBe('炼狱传承')
+    expect(translateGameTerm('Gnome Cunning', 'zh', 'feature')).toBe('侏儒狡黠')
+    expect(translateGameTerm('Otherworldly Patron: The Fiend', 'zh', 'feature')).toBe('异界宗主：邪魔宗主')
+    expect(translateGameTerm('Pact Magic', 'zh', 'feature')).toBe('契约魔法')
+    expect(translateGameTerm('Divine Domain: Life', 'zh', 'feature')).toBe('神圣领域：生命领域')
+    expect(translateGameTerm('Divine Domain: Life Domain', 'zh', 'feature')).toBe('神圣领域：生命领域')
+    expect(translateGameTerm('Sorcerous Origin: Draconic Bloodline', 'zh', 'feature')).toBe('术法起源：龙族血脉')
+    expect(translateGameTerm('Fighting Style: Archery', 'zh', 'feature')).toBe('战斗风格：箭术')
+    expect(translateGameTerm('10 Darts', 'zh', 'equipment')).toBe('10 支飞镖')
+    expect(translateGameTerm('Wooden Shield', 'zh', 'equipment')).toBe('木盾')
+    expect(translateGameTerm('Druidic Focus', 'zh', 'equipment')).toBe('德鲁伊法器')
+    expect(translateGameTerm("Traveler's clothes", 'zh', 'equipment')).toBe('旅行服装')
+    expect(translateGameTerm('lute', 'zh', 'proficiency')).toBe('鲁特琴')
+  })
+
   it('covers all D&D 5e background display terms in Chinese', () => {
     for (const background of backgrounds) {
       expectChineseTerm(background.name, 'background')
